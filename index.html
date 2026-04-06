@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Romans — Branch Together Reading Plan</title>
+  <meta name="description" content="A 16-day reading plan through the Book of Romans with Branch Together video teaching.">
+  <meta name="theme-color" content="#2a2520">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Romans">
+  <link rel="apple-touch-icon" href="/icons/icon-192.png">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+
+  <!-- ==================== LOADING SCREEN ==================== -->
+  <div id="loading-screen" class="screen active">
+    <div class="loading-screen">
+      <div class="spinner"></div>
+    </div>
+  </div>
+
+  <!-- ==================== AUTH SCREEN ==================== -->
+  <div id="auth-screen" class="screen">
+    <div class="container">
+      <h1>The Book of Romans</h1>
+      <p class="tagline">A Branch Together Reading Plan</p>
+
+      <form class="auth-form" id="login-form">
+        <label for="email-input">Your email</label>
+        <input
+          type="email"
+          id="email-input"
+          name="email"
+          placeholder="you@example.com"
+          required
+          autocomplete="email"
+        >
+        <button type="submit" class="btn btn-primary" id="login-btn">
+          Send Login Link
+        </button>
+      </form>
+
+      <div id="auth-message" class="auth-message"></div>
+
+      <p style="margin-top: 2rem; font-family: 'Inter', sans-serif; font-size: 0.8rem; color: var(--text-light);">
+        No password needed. We'll email you a secure login link.
+      </p>
+    </div>
+  </div>
+
+  <!-- ==================== DAY LIST SCREEN ==================== -->
+  <div id="list-screen" class="screen">
+    <div class="container">
+
+      <!-- User bar -->
+      <div class="user-bar">
+        <span class="user-name">Hi, <span id="user-display-name"></span></span>
+        <button class="logout-btn" onclick="handleLogout()">Log out</button>
+      </div>
+
+      <!-- App header -->
+      <div class="app-header">
+        <div class="brand">Branch Together</div>
+        <h1>The Book of Romans</h1>
+        <div class="subtitle">16-day reading plan</div>
+      </div>
+
+      <!-- Progress -->
+      <div class="progress-section">
+        <div class="progress-label" id="progress-label">0 of 16 days completed</div>
+        <div class="progress-bar-track">
+          <div class="progress-bar-fill" id="progress-fill"></div>
+        </div>
+      </div>
+
+      <!-- Day list -->
+      <ul class="day-list" id="day-list">
+        <!-- Rendered by app.js -->
+      </ul>
+
+    </div>
+  </div>
+
+  <!-- ==================== DAY DETAIL SCREEN ==================== -->
+  <div id="day-screen" class="screen">
+    <div class="container" id="day-content">
+      <!-- Rendered by app.js -->
+    </div>
+  </div>
+
+  <!-- ==================== SCRIPTS ==================== -->
+  <!-- Supabase JS client via CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- App scripts (order matters: auth → progress → app) -->
+  <script src="/js/auth.js"></script>
+  <script src="/js/progress.js"></script>
+  <script src="/js/app.js"></script>
+
+  <!-- Register service worker -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then(reg => console.log('SW registered:', reg.scope))
+          .catch(err => console.log('SW registration failed:', err));
+      });
+    }
+  </script>
+
+</body>
+</html>
