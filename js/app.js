@@ -279,7 +279,7 @@ async function initApp() {
   if (loginForm) {
     loginForm.addEventListener('submit', handleLogin);
   }
-});
+}
 
 
 // ---- Screen Management ----

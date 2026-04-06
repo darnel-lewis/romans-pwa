@@ -10,7 +10,7 @@ let completedDays = [];
 async function fetchProgress() {
   if (!currentUser) return [];
 
-  const { data, error } = await supabase
+  const { data, error } = await supabaseClient
     .from('progress')
     .select('completed_days')
     .eq('user_id', currentUser.id)
@@ -37,7 +37,7 @@ async function markDayComplete(dayNumber) {
 
   const updated = [...completedDays, dayNumber].sort((a, b) => a - b);
 
-  const { error } = await supabase
+  const { error } = await supabaseClient
     .from('progress')
     .update({
       completed_days: updated,

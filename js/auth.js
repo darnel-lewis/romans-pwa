@@ -6,7 +6,7 @@ const SUPABASE_URL = 'https://udjavqrklqzvaripmizn.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_daeSVPe-Slv3LUUvrLcXLg_Tw94vLMc';
 
 // Initialize Supabase client
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // Current user state
 let currentUser = null;
@@ -15,7 +15,7 @@ let currentUser = null;
  * Send a magic link to the user's email
  */
 async function sendMagicLink(email) {
-  const { error } = await supabase.auth.signInWithOtp({
+  const { error } = await supabaseClient.auth.signInWithOtp({
     email: email,
     options: {
       emailRedirectTo: window.location.origin
@@ -33,7 +33,7 @@ async function sendMagicLink(email) {
  */
 async function ensureUserProfile(user) {
   // Upsert into users table
-  const { error: userError } = await supabase
+  const { error: userError } = await supabaseClient
     .from('users')
     .upsert({
       id: user.id,
@@ -46,7 +46,7 @@ async function ensureUserProfile(user) {
   }
 
   // Upsert into progress table
-  const { error: progressError } = await supabase
+  const { error: progressError } = await supabaseClient
     .from('progress')
     .upsert({
       user_id: user.id,
@@ -63,7 +63,7 @@ async function ensureUserProfile(user) {
  * Get the current session and user
  */
 async function getSession() {
-  const { data: { session }, error } = await supabase.auth.getSession();
+  const { data: { session }, error } = await supabaseClient.auth.getSession();
   if (error) {
     console.error('Session error:', error);
     return null;
@@ -75,7 +75,7 @@ async function getSession() {
  * Sign the user out
  */
 async function signOut() {
-  const { error } = await supabase.auth.signOut();
+  const { error } = await supabaseClient.auth.signOut();
   if (error) {
     console.error('Logout error:', error);
   }
@@ -87,7 +87,7 @@ async function signOut() {
  * Calls the provided callback with (event, session).
  */
 function onAuthStateChange(callback) {
-  supabase.auth.onAuthStateChange((event, session) => {
+  supabaseClient.auth.onAuthStateChange((event, session) => {
     if (session?.user) {
       currentUser = session.user;
     } else {
