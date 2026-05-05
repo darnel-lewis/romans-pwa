@@ -218,12 +218,11 @@ button { -webkit-tap-highlight-color: transparent; }
 }
 #worship-view.theme-a .hdr-date {
   font-family: 'JetBrains Mono', ui-monospace, monospace;
-  letter-spacing: 0.02em;
-  text-transform: none;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   font-size: 11px;
+  color: var(--muted);
   margin-bottom: 18px;
-  display: flex;
-  justify-content: space-between;
 }
 #worship-view.theme-a .worship-title {
   font-weight: 500;
@@ -245,7 +244,7 @@ button { -webkit-tap-highlight-color: transparent; }
 #worship-view.theme-a .mini-nav {
   display: flex;
   gap: 6px;
-  padding: 0 22px 22px;
+  padding: 0 22px 40px;
   overflow-x: auto;
   overflow-y: hidden;
   scrollbar-width: none;
@@ -352,10 +351,8 @@ button { -webkit-tap-highlight-color: transparent; }
 #worship-view.theme-a .stanzas { color: var(--dim); }
 #worship-view.theme-a .stanza { margin-bottom: 18px; line-height: 1.5; }
 #worship-view.theme-a .stanza.chorus {
-  padding-left: 16px;
-  border-left: 2px solid var(--ink);
   color: var(--ink);
-  font-weight: 500;
+  font-weight: 600;
 }
 
 /* ============================================================

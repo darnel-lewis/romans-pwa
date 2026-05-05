@@ -256,10 +256,12 @@ function formatDateB() {
   const mm = String(d.getMonth() + 1).padStart(2, '0');
   const dd = String(d.getDate()).padStart(2, '0');
   const day = d.toLocaleDateString(undefined, { weekday: 'long' });
+  const monthDay = d.toLocaleDateString(undefined, { month: 'long', day: 'numeric' });
   return {
     iso: `${yyyy}.${mm}.${dd} / ${day.slice(0, 3).toUpperCase()}`,
     weekday: day,
     pretty: d.toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' }),
+    combined: `${day} · ${monthDay}`.toUpperCase(),
   };
 }
 
@@ -333,8 +335,7 @@ function renderWorship() {
   const dateEl = document.getElementById('hdr-date');
   const churchEl = document.getElementById('hdr-church');
   if (style === 'a') {
-    const d = formatDateB();
-    dateEl.innerHTML = `<span>${esc(d.weekday)}</span><span>${esc(d.pretty)}</span>`;
+    dateEl.textContent = formatDateB().combined;
     churchEl.textContent = 'Order of Service';
   } else {
     dateEl.textContent = formatDateA();
