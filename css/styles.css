@@ -1636,3 +1636,122 @@ body.modal-open { overflow: hidden; }
 }
 .members-invite input { flex: 1 1 auto; }
 .members-invite .btn { padding: .55rem .85rem; font-size: .9rem; }
+
+/* ============================================================
+   ADMIN — SAVE STATUS, BULK PASTE MODAL, ARCHIVE STUB
+   ============================================================ */
+
+/* Save status text in the save bar */
+.save-status {
+  margin-right: auto;
+  font-size: .8rem;
+  color: #8a8a8a;
+  font-weight: 500;
+  letter-spacing: .01em;
+  align-self: center;
+}
+.save-status[data-state="saving"] { color: #6b4f2a; }
+.save-status[data-state="saved"]  { color: #4a8a4a; }
+.save-status[data-state="dirty"]  { color: #8a8a8a; }
+
+.save-bar {
+  align-items: center;
+}
+
+/* Archive stub paragraph */
+.archive-stub {
+  background: #fdfaf2;
+  border: 1px dashed #ece2c9;
+  border-radius: 10px;
+  padding: .65rem .8rem;
+  font-size: .88rem;
+  line-height: 1.5;
+  color: #6a6a6a;
+}
+.archive-stub strong { color: #1a1a1a; font-weight: 600; }
+
+/* Wider bulk-paste modal */
+.modal-card-wide { max-width: 720px; }
+
+.modal-hint {
+  font-size: .9rem;
+  color: #4a4a4a;
+  margin: 0 0 .9rem;
+  line-height: 1.5;
+}
+.modal-hint code {
+  background: #f1ead9;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: .82rem;
+  color: #6b4f2a;
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+}
+
+.bulk-actions {
+  display: flex;
+  gap: .5rem;
+  margin-bottom: .75rem;
+  flex-wrap: wrap;
+}
+.bulk-actions .btn { padding: .45rem .8rem; font-size: .85rem; }
+
+.bulk-paste-input {
+  width: 100%;
+  min-height: 280px;
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  font-size: .88rem;
+  line-height: 1.55;
+  padding: .85rem 1rem;
+  border: 1px solid #e8e2d6;
+  border-radius: 10px;
+  background: #fafafa;
+  resize: vertical;
+}
+.bulk-paste-input:focus {
+  border-color: #6b4f2a;
+  box-shadow: 0 0 0 3px #f1ead9;
+  outline: none;
+  background: #fff;
+}
+
+.format-key {
+  margin-top: .85rem;
+  font-size: .85rem;
+}
+.format-key summary {
+  cursor: pointer;
+  color: #4a4a4a;
+  font-weight: 500;
+  padding: .35rem 0;
+  user-select: none;
+}
+.format-key summary:hover { color: #1a1a1a; }
+.format-key ul {
+  margin: .35rem 0 0 0;
+  padding-left: 1.1rem;
+  color: #4a4a4a;
+  line-height: 1.55;
+}
+.format-key li + li { margin-top: .35rem; }
+.format-key code {
+  background: #f1ead9;
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-size: .82rem;
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+}
+
+.modal-actions {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  margin-top: 1.25rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.modal-action-status {
+  margin-right: auto;
+  color: #b00020;
+  font-size: .85rem;
+}

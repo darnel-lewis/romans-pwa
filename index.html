@@ -193,6 +193,7 @@
 
       <div class="editor-toolbar">
         <span class="editor-toolbar-label">Service order</span>
+        <button type="button" class="admin-tool" data-action="open-bulk-paste">Bulk paste</button>
         <button type="button" class="admin-tool" data-action="collapse-all">Collapse all</button>
         <button type="button" class="admin-tool" data-action="expand-all">Expand all</button>
       </div>
@@ -207,8 +208,9 @@
       </div>
 
       <div class="save-bar">
-        <a href="#" class="btn btn-ghost">Preview</a>
-        <button class="btn btn-primary" id="save-btn">Save</button>
+        <span class="save-status" id="save-status" data-state="idle"></span>
+        <a href="#" class="btn btn-ghost" data-action="open-preview">Preview</a>
+        <button class="btn btn-primary" id="save-btn">Save now</button>
       </div>
       <div id="save-message" class="save-message"></div>
     </div>
@@ -254,6 +256,16 @@
           </div>
           <div class="field-hint">Add co-editors so a backup leader can update next Sunday's service. Real invites will fire when accounts are live; for now this is a placeholder.</div>
 
+          <div class="settings-divider"></div>
+
+          <div class="members-head">
+            <span class="members-title">Past services</span>
+            <span class="members-pending-tag">Coming with accounts</span>
+          </div>
+          <div class="archive-stub">
+            Once accounts are live, every saved service is archived so you can revisit last week's set or duplicate one for next week. For now, use <strong>Download backup</strong> in the Library to save a snapshot.
+          </div>
+
         </div>
       </div>
     </div>
@@ -292,6 +304,58 @@
                 <button type="button" class="btn btn-ghost" data-action="email-link">Email link</button>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-overlay" data-modal="bulk-paste" hidden>
+      <div class="modal-card modal-card-wide" role="dialog" aria-label="Bulk paste service">
+        <div class="modal-head">
+          <h3>Paste a service</h3>
+          <button type="button" class="modal-close" data-action="close-modal" aria-label="Close">×</button>
+        </div>
+        <div class="modal-body">
+          <p class="modal-hint">Paste an entire service in the format below. <code>#</code> starts a song, <code>&gt;</code> a scripture, <code>!</code> a note. Round-trips: <strong>Use my current service</strong> exports the live service in this format so you can edit and re-paste.</p>
+
+          <div class="bulk-actions">
+            <button type="button" class="btn btn-ghost" data-action="bulk-paste-prefill">Use my current service</button>
+            <button type="button" class="btn btn-ghost" data-action="bulk-paste-clear">Clear</button>
+          </div>
+
+          <textarea id="bulk-paste-input" class="bulk-paste-input" rows="14" spellcheck="false" placeholder="# Holy, Holy, Holy
+Reginald Heber, 1826
+
+Holy, holy, holy! Lord God Almighty!
+Early in the morning our song shall rise to Thee.
+
+[chorus]
+Holy, holy, holy! All the saints adore Thee...
+
+> Ephesians 2:4–9
+~ Christian Standard Bible
+
+4 But God, being rich in mercy...
+5 even when we were dead in our trespasses...
+
+! Going Deeper
+
+Read Isaiah 6 in full. Notice how the vision of holiness leads not to despair but to commission."></textarea>
+
+          <details class="format-key">
+            <summary>Format key</summary>
+            <ul>
+              <li><code># Title</code> &mdash; song. Next line under the title is the attribution (optional). Blank line separates stanzas. <code>[chorus]</code> on its own line marks the chorus stanza.</li>
+              <li><code>&gt; Reference</code> &mdash; scripture. Optional <code>~ Translation</code> on the next line. One verse per line, starting with the verse number.</li>
+              <li><code>! Title</code> &mdash; note. Body paragraphs separated by blank lines.</li>
+            </ul>
+          </details>
+
+          <div class="modal-actions">
+            <span class="modal-action-status" id="bulk-paste-status"></span>
+            <button type="button" class="btn btn-ghost" data-action="close-modal">Cancel</button>
+            <button type="button" class="btn btn-secondary" data-action="bulk-paste-append">Append to service</button>
+            <button type="button" class="btn btn-primary" data-action="bulk-paste-replace">Replace service</button>
           </div>
         </div>
       </div>

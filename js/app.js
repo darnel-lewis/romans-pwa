@@ -898,19 +898,21 @@ function initSortable() {
       const [moved] = draft.blocks.splice(evt.oldIndex, 1);
       draft.blocks.splice(evt.newIndex, 0, moved);
       paintEditor();
+      scheduleAutoSave();
     },
   });
 }
 
 document.addEventListener('input', (e) => {
   const t = e.target;
-  if (t && t.id === 'church-name') { draft.church = t.value; return; }
-  if (t && t.id === 'subtitle-text') { draft.subtitle = t.value; return; }
-  if (t && t.id === 'footer-text') { draft.footer = t.value; return; }
+  if (t && t.id === 'church-name') { draft.church = t.value; scheduleAutoSave(); return; }
+  if (t && t.id === 'subtitle-text') { draft.subtitle = t.value; scheduleAutoSave(); return; }
+  if (t && t.id === 'footer-text') { draft.footer = t.value; scheduleAutoSave(); return; }
   if (!t || !t.dataset || !t.dataset.field) return;
   const i = Number(t.dataset.index);
   draft.blocks[i][t.dataset.field] = t.value;
   if (t.dataset.songTitle) renderSongSuggest(i, t.value);
+  scheduleAutoSave();
 });
 
 function renderSongSuggest(index, query) {
@@ -974,6 +976,7 @@ document.addEventListener('mousedown', (e) => {
     stanzas: song.stanzas,
   });
   paintEditor();
+  scheduleAutoSave();
 });
 
 document.addEventListener('click', (e) => {
@@ -981,6 +984,7 @@ document.addEventListener('click', (e) => {
   if (styleOpt && styleOpt.dataset.style) {
     draft.style = styleOpt.dataset.style;
     paintStylePicker();
+    scheduleAutoSave();
     return;
   }
 
@@ -995,10 +999,12 @@ document.addEventListener('click', (e) => {
     draft.blocks.splice(i, 1);
     if (!draft.blocks.length) draft.blocks.push(emptyDraftItem('song'));
     paintEditor();
+    scheduleAutoSave();
   } else if (action === 'add') {
     const kind = t.dataset.type || 'song';
     draft.blocks.push(emptyDraftItem(kind));
     paintEditor();
+    scheduleAutoSave();
     const last = editorEl().querySelector('.item-card:last-child input');
     if (last) last.focus();
   } else if (action === 'toggle-collapse') {
@@ -1018,6 +1024,22 @@ document.addEventListener('click', (e) => {
     paintEditor();
   } else if (action === 'invite-member') {
     inviteMemberStub();
+  } else if (action === 'open-bulk-paste') {
+    togglePanel('bulk-paste');
+  } else if (action === 'bulk-paste-prefill') {
+    const ta = document.getElementById('bulk-paste-input');
+    if (ta) ta.value = serializeDraft(draft.blocks);
+  } else if (action === 'bulk-paste-clear') {
+    const ta = document.getElementById('bulk-paste-input');
+    if (ta) { ta.value = ''; ta.focus(); }
+  } else if (action === 'bulk-paste-replace') {
+    bulkPasteApply('replace');
+  } else if (action === 'bulk-paste-append') {
+    bulkPasteApply('append');
+  } else if (action === 'open-preview') {
+    e.preventDefault();
+    performSave({ silent: true });
+    window.open('/', '_blank');
   } else if (action === 'close-modal') {
     closeModals();
   }
@@ -1045,6 +1067,131 @@ function closeModals() {
   document.body.classList.remove('modal-open');
 }
 
+/* ---------- bulk paste / serialize ----------
+ *
+ * Round-trip text format:
+ *   # Title          song
+ *   (next line)      attribution
+ *   blank line       stanza separator
+ *   [chorus]         chorus marker
+ *
+ *   > Reference      scripture
+ *   ~ Translation    optional version
+ *   N text…          one verse per line, leading number
+ *
+ *   ! Title          note
+ *   blank line       paragraph separator
+ */
+
+function serializeDraft(draftBlocks) {
+  const out = [];
+  draftBlocks.forEach((b) => {
+    const title = (b.title || '').trim();
+    if (b.kind === 'song') {
+      out.push(`# ${title || 'Untitled'}`);
+      const meta = (b.meta || '').trim();
+      if (meta) out.push(meta);
+      out.push('');
+      out.push((b.body || '').trim());
+    } else if (b.kind === 'scripture') {
+      out.push(`> ${title || 'Reference'}`);
+      const meta = (b.meta || '').trim();
+      if (meta) out.push(`~ ${meta}`);
+      out.push('');
+      out.push((b.body || '').trim());
+    } else if (b.kind === 'note') {
+      out.push(`! ${title || 'Untitled note'}`);
+      out.push('');
+      out.push((b.body || '').trim());
+    }
+    out.push('');
+    out.push('');
+  });
+  return out.join('\n').replace(/\n{3,}/g, '\n\n').trim() + '\n';
+}
+
+function parseBulkText(text) {
+  const lines = (text || '').split(/\r?\n/);
+  const blocks = [];
+  let cur = null;
+  let bodyLines = [];
+
+  const flush = () => {
+    if (!cur) return;
+    const body = bodyLines.join('\n').replace(/^\s*\n+/, '').replace(/\s+$/, '');
+    blocks.push({ ...cur, body });
+    cur = null;
+    bodyLines = [];
+  };
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const trimmed = line.trim();
+    const m = trimmed.match(/^([#>!])\s+(.*)$/);
+    if (m) {
+      flush();
+      const marker = m[1];
+      const title = m[2].trim();
+      if (marker === '#') {
+        cur = { kind: 'song', title, meta: '' };
+        // Look ahead for attribution (first non-blank line that isn't a marker)
+        let j = i + 1;
+        while (j < lines.length && lines[j].trim() === '') j++;
+        if (j < lines.length) {
+          const peek = lines[j].trim();
+          if (peek && !/^[#>!]\s/.test(peek) && !/^\[chorus\]$/i.test(peek) && !/^\d+\s/.test(peek)) {
+            cur.meta = peek;
+            i = j;
+          }
+        }
+      } else if (marker === '>') {
+        cur = { kind: 'scripture', title, meta: '' };
+        let j = i + 1;
+        while (j < lines.length && lines[j].trim() === '') j++;
+        if (j < lines.length) {
+          const peek = lines[j].trim();
+          const vm = peek.match(/^~\s+(.*)$/);
+          if (vm) {
+            cur.meta = vm[1].trim();
+            i = j;
+          }
+        }
+      } else if (marker === '!') {
+        cur = { kind: 'note', title, meta: '' };
+      }
+    } else if (cur) {
+      bodyLines.push(line);
+    }
+  }
+  flush();
+  return blocks;
+}
+
+function bulkPasteApply(mode) {
+  const ta = document.getElementById('bulk-paste-input');
+  const status = document.getElementById('bulk-paste-status');
+  const text = (ta && ta.value || '').trim();
+  if (!text) {
+    if (status) status.textContent = 'Paste some text first.';
+    return;
+  }
+  const parsed = parseBulkText(text);
+  if (!parsed.length) {
+    if (status) status.textContent = "Couldn't find any blocks. Lines must start with #, >, or !.";
+    return;
+  }
+  if (mode === 'replace') {
+    draft.blocks = parsed;
+    collapsedIds.clear();
+  } else {
+    draft.blocks.push(...parsed);
+  }
+  ensureDraftIds();
+  paintEditor();
+  scheduleAutoSave();
+  closeModals();
+}
+
 function inviteMemberStub() {
   const input = document.getElementById('invite-email');
   const email = (input && input.value || '').trim();
@@ -1059,8 +1206,13 @@ function inviteMemberStub() {
   if (input) input.value = '';
 }
 
-const saveBtn = document.getElementById('save-btn');
-if (saveBtn) saveBtn.addEventListener('click', () => {
+/* ---------- save (manual + auto) ---------- */
+
+let saveTimer = null;
+
+function performSave({ silent = false } = {}) {
+  if (saveTimer) { clearTimeout(saveTimer); saveTimer = null; }
+  setSaveStatus('saving', 'Saving…');
   const blocks = draft.blocks
     .map(draftToBlock)
     .filter((b) => {
@@ -1078,10 +1230,32 @@ if (saveBtn) saveBtn.addEventListener('click', () => {
     blocks,
   });
   libraryUpsert(blocks.filter((b) => b.kind === 'song'));
-  const msg = document.getElementById('save-message');
-  msg.textContent = `Saved ${blocks.length} block${blocks.length === 1 ? '' : 's'}.`;
-  setTimeout(() => { msg.textContent = ''; }, 2400);
-});
+  const t = new Date().toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+  setSaveStatus('saved', `Saved at ${t}`);
+  if (!silent) {
+    const msg = document.getElementById('save-message');
+    if (msg) {
+      msg.textContent = `Saved ${blocks.length} block${blocks.length === 1 ? '' : 's'}.`;
+      setTimeout(() => { msg.textContent = ''; }, 2000);
+    }
+  }
+}
+
+function scheduleAutoSave() {
+  setSaveStatus('dirty', 'Unsaved changes');
+  if (saveTimer) clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => performSave({ silent: true }), 800);
+}
+
+function setSaveStatus(state, text) {
+  const el = document.getElementById('save-status');
+  if (!el) return;
+  el.dataset.state = state;
+  el.textContent = text;
+}
+
+const saveBtn = document.getElementById('save-btn');
+if (saveBtn) saveBtn.addEventListener('click', () => performSave());
 
 const logoutBtn = document.getElementById('logout-btn');
 if (logoutBtn) logoutBtn.addEventListener('click', () => {
