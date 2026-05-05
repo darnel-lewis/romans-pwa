@@ -221,6 +221,11 @@
           <span class="item-card-num">Song library</span>
           <span class="library-hint">Songs you save are kept here. Tap delete to remove.</span>
         </div>
+        <div class="library-actions">
+          <button type="button" class="btn btn-ghost" data-action="library-export">Download backup</button>
+          <button type="button" class="btn btn-ghost" data-action="library-import">Restore from backup</button>
+          <input type="file" id="library-import-input" accept="application/json,.json" hidden>
+        </div>
         <div id="library-list" class="library-list"></div>
       </div>
 
