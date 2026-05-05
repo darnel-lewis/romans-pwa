@@ -2,7 +2,7 @@
  *
  * Data shape (per block):
  *   { kind: 'song',      title, attribution, stanzas: [{ type, lines[] }] }
- *   { kind: 'scripture', reference, verses: [{ n, text }] }
+ *   { kind: 'scripture', reference, version, verses: [{ n, text }] }
  *   { kind: 'note',      title, body: [paragraphs] }
  *
  * Auth and storage are mocked with localStorage so the full flow works
@@ -86,6 +86,7 @@ const SEED_SERVICE = {
     {
       kind: 'scripture',
       reference: 'Ephesians 2:4–9',
+      version: 'Christian Standard Bible',
       verses: [
         { n: 4, text: 'But God, being rich in mercy, because of the great love with which he loved us,' },
         { n: 5, text: 'even when we were dead in our trespasses, made us alive together with Christ — by grace you have been saved —' },
@@ -292,6 +293,10 @@ function renderSong(b, style) {
 }
 
 function renderScripture(b, style) {
+  const version = (b.version || '').trim();
+  const versionEl = version
+    ? `<div class="scripture-version">${esc(version)}</div>`
+    : '';
   if (style === 'a') {
     const rows = (b.verses || []).map((v) => `
       <div class="verse-row">
@@ -303,6 +308,7 @@ function renderScripture(b, style) {
       <article class="block block-scripture">
         <div class="scripture-head">
           <h2 class="scripture-reference">${esc(b.reference || '')}</h2>
+          ${versionEl}
         </div>
         <div class="verses">${rows}</div>
       </article>
@@ -315,6 +321,7 @@ function renderScripture(b, style) {
     <article class="block block-scripture">
       <div class="scripture-head">
         <h2 class="scripture-reference">${esc(b.reference || '')}</h2>
+        ${versionEl}
       </div>
       <p class="scripture-prose">${verses}</p>
     </article>
@@ -514,8 +521,8 @@ const ITEM_TYPES = {
   scripture: {
     label: 'Scripture',
     titlePlaceholder: 'e.g. Isaiah 6:1–4',
-    metaLabel: '',
-    metaPlaceholder: '',
+    metaLabel: 'Version (optional)',
+    metaPlaceholder: 'e.g. Christian Standard Bible',
     bodyLabel: 'Verses',
     bodyPlaceholder:
       '1 In the year that King Uzziah died I saw the Lord sitting upon a throne...\n2 Above him stood the seraphim...',
@@ -574,7 +581,7 @@ function blockToDraft(b) {
   }
   if (b.kind === 'scripture') {
     const body = (b.verses || []).map((v) => `${v.n} ${v.text}`).join('\n');
-    return { kind: 'scripture', title: b.reference || '', meta: '', body };
+    return { kind: 'scripture', title: b.reference || '', meta: b.version || '', body };
   }
   if (b.kind === 'note') {
     const body = (b.body || []).join('\n\n');
@@ -611,6 +618,7 @@ function draftToBlock(d) {
     return {
       kind: 'scripture',
       reference: (d.title || '').trim(),
+      version: (d.meta || '').trim(),
       verses,
     };
   }
