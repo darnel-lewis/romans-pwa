@@ -20,7 +20,6 @@
   <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
-
   <!-- Public worship view -->
   <main id="worship-view" class="view active theme-a" data-size="1">
 
@@ -132,6 +131,29 @@
     </main>
   </section>
 
+  <!-- Kiosk display view (big QR for tablets / shared screens) -->
+  <section id="kiosk-view" class="view">
+    <div class="kiosk-frame">
+      <header class="kiosk-header">
+        <div class="kiosk-wordmark">Today&rsquo;s Worship</div>
+        <h1 class="kiosk-church" id="kiosk-church"></h1>
+        <div class="kiosk-subtitle" id="kiosk-subtitle"></div>
+      </header>
+
+      <div class="kiosk-qr" id="kiosk-qr" aria-label="QR code"></div>
+
+      <div class="kiosk-caption">
+        Scan to follow along on your phone
+        <div class="kiosk-url" id="kiosk-url"></div>
+      </div>
+
+      <div class="kiosk-controls">
+        <button type="button" class="btn btn-ghost" data-action="kiosk-fullscreen" id="kiosk-fs-btn">Keep awake &amp; fullscreen</button>
+        <a href="#admin" class="kiosk-back">&larr; Exit</a>
+      </div>
+    </div>
+  </section>
+
   <!-- Login (magic link) view -->
   <section id="login-view" class="view">
     <div class="login-card">
@@ -186,6 +208,21 @@
         <div class="field-hint">Shown at the bottom of the public page.</div>
       </div>
 
+      <div class="item-card">
+        <div class="item-card-head"><span class="item-card-num">Share</span></div>
+        <div class="share-row">
+          <div class="share-qr" id="admin-qr" aria-label="QR code preview"></div>
+          <div class="share-info">
+            <div class="share-label">Public URL</div>
+            <div class="share-url" id="admin-url"></div>
+            <div class="share-actions">
+              <a href="#kiosk" class="btn btn-ghost" target="_blank" rel="noopener">Open kiosk</a>
+              <button type="button" class="btn btn-ghost" data-action="email-link">Email link</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div id="song-editor"></div>
 
       <div class="add-row">
@@ -203,6 +240,7 @@
     </div>
   </section>
 
+  <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
   <script src="/js/app.js"></script>
 
   <script>
