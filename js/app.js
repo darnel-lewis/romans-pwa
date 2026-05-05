@@ -354,13 +354,13 @@ function renderWorship() {
     container.innerHTML = service.blocks.map(renderBlock).join('');
   }
 
-  // footer
+  // footer (custom text used by both styles; rendered with each variant's treatment)
   const footer = document.getElementById('worship-footer');
+  const footerText = (service.footer || '').trim() || 'Soli Deo Gloria';
   if (style === 'b') {
-    footer.innerHTML = `<span>END</span>`;
+    footer.innerHTML = `<span>${esc(footerText)}</span>`;
   } else {
-    const text = (service.footer || '').trim() || 'Soli Deo Gloria';
-    footer.innerHTML = `✶ ${esc(text)} ✶`;
+    footer.innerHTML = `✶ ${esc(footerText)} ✶`;
   }
 
   setupMiniNavTracking();
