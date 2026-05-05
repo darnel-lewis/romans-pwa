@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Today's Worship</title>
+  <meta name="description" content="Lyrics for today's worship service.">
+  <meta name="theme-color" content="#1a1a1a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+
+  <!-- Public worship view -->
+  <main id="worship-view" class="view active">
+    <header class="worship-header">
+      <div class="eyebrow" id="today-date"></div>
+      <h1 class="worship-title">Today&rsquo;s Worship</h1>
+    </header>
+
+    <section id="songs" class="songs">
+      <!-- songs rendered here -->
+    </section>
+
+    <footer class="worship-footer">
+      <a href="#admin" class="admin-link">Admin</a>
+    </footer>
+  </main>
+
+  <!-- Login (magic link) view -->
+  <section id="login-view" class="view">
+    <div class="login-card">
+      <h2>Sign in</h2>
+      <p class="login-sub">Enter your email and we&rsquo;ll send you a magic link.</p>
+      <form id="login-form">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" required autocomplete="email" placeholder="you@example.com">
+        <button type="submit" class="btn btn-primary">Send magic link</button>
+      </form>
+      <div id="login-message" class="login-message"></div>
+      <a href="#" class="back-link">&larr; Back to worship</a>
+    </div>
+  </section>
+
+  <!-- Admin / editor view -->
+  <section id="admin-view" class="view">
+    <header class="admin-header">
+      <h2>Edit Today&rsquo;s Worship</h2>
+      <div class="admin-actions">
+        <span class="signed-in" id="signed-in-as"></span>
+        <button class="btn btn-ghost" id="logout-btn">Sign out</button>
+      </div>
+    </header>
+
+    <div class="admin-body">
+      <div id="song-editor"></div>
+      <button class="btn btn-secondary" id="add-song-btn">+ Add another song</button>
+
+      <div class="save-bar">
+        <a href="#" class="btn btn-ghost">Preview</a>
+        <button class="btn btn-primary" id="save-btn">Save</button>
+      </div>
+      <div id="save-message" class="save-message"></div>
+    </div>
+  </section>
+
+  <script src="./app.js"></script>
+</body>
+</html>
