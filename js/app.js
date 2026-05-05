@@ -377,6 +377,15 @@ function setupMiniNavTracking() {
 
 /* Topbar + mini-nav handlers (delegated, attached once) */
 document.addEventListener('click', (e) => {
+  const scroll = e.target.closest('[data-scroll]');
+  if (scroll) {
+    const target = document.getElementById(scroll.dataset.scroll);
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    return;
+  }
+
   const t = e.target.closest('[data-action], [data-jump]');
   if (!t) return;
 

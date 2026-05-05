@@ -76,24 +76,26 @@
         </p>
         <div class="landing-cta">
           <a href="#admin" class="btn btn-primary">Get started</a>
-          <a href="#" class="btn btn-ghost">See a demo &rarr;</a>
+          <button type="button" class="btn btn-ghost" data-scroll="how-it-works">How it works &darr;</button>
         </div>
       </section>
 
       <section class="landing-preview" aria-label="Live preview">
         <div class="phone-frame">
           <div class="phone-notch" aria-hidden="true"></div>
-          <iframe
-            class="phone-screen"
-            src="/"
-            title="Live preview of a worship page"
-            loading="lazy"
-          ></iframe>
+          <div class="phone-screen-wrap">
+            <iframe
+              class="phone-screen"
+              src="/"
+              title="Live preview of a worship page"
+              loading="lazy"
+            ></iframe>
+          </div>
         </div>
         <div class="landing-preview-caption">A real, live page &mdash; scroll it.</div>
       </section>
 
-      <section class="landing-steps">
+      <section class="landing-steps" id="how-it-works">
         <div class="landing-section-eyebrow">How it works</div>
         <ol class="steps">
           <li class="step">
@@ -118,6 +120,9 @@
             </div>
           </li>
         </ol>
+        <div class="steps-cta">
+          <a href="#" class="see-live">See it live, full screen &rarr;</a>
+        </div>
       </section>
 
       <footer class="landing-footer">
