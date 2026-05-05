@@ -1466,3 +1466,11 @@ textarea { resize: vertical; min-height: 180px; line-height: 1.6; font-family: u
 .item-card-chosen {
   box-shadow: 0 6px 24px rgba(0,0,0,0.08);
 }
+
+.library-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+  margin-bottom: .75rem;
+}
+.library-actions .btn { padding: .5rem .85rem; font-size: .85rem; }

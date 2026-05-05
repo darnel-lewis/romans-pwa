@@ -543,6 +543,18 @@ document.addEventListener('click', (e) => {
     togglePanel(t.dataset.panel);
   } else if (action === 'library-delete') {
     libraryDelete(t.dataset.libraryKey);
+  } else if (action === 'library-export') {
+    exportBackup();
+  } else if (action === 'library-import') {
+    document.getElementById('library-import-input').click();
+  }
+});
+
+document.addEventListener('change', (e) => {
+  if (e.target && e.target.id === 'library-import-input') {
+    const file = e.target.files && e.target.files[0];
+    importBackup(file);
+    e.target.value = ''; // allow re-selecting the same file
   }
 });
 
@@ -594,6 +606,56 @@ function libraryDelete(key) {
   const lib = getSongLibrary().filter((s) => normalizeTitle(s.title) !== key);
   saveSongLibrary(lib);
   renderLibraryList();
+}
+
+function exportBackup() {
+  const data = {
+    app: 'todays-worship',
+    version: 1,
+    exported: new Date().toISOString(),
+    library: getSongLibrary(),
+    service: getService(),
+  };
+  const json = JSON.stringify(data, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `todays-worship-backup-${new Date().toISOString().slice(0, 10)}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function importBackup(file) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    let data;
+    try {
+      data = JSON.parse(reader.result);
+    } catch {
+      alert("Could not read this file. Make sure it's a backup downloaded from this app.");
+      return;
+    }
+    const incoming = (data && Array.isArray(data.library)) ? data.library : null;
+    if (!incoming) {
+      alert('No song library found in this file.');
+      return;
+    }
+    const valid = incoming.filter((s) =>
+      s && typeof s === 'object' && s.title && Array.isArray(s.stanzas)
+    );
+    if (!valid.length) {
+      alert("This file has no valid songs to restore.");
+      return;
+    }
+    libraryUpsert(valid);
+    alert(`Restored ${valid.length} song${valid.length === 1 ? '' : 's'} into your library.`);
+    renderLibraryList();
+  };
+  reader.readAsText(file);
 }
 
 /* ---------- login (mock magic link) ---------- */
