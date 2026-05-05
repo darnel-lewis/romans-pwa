@@ -244,17 +244,24 @@ button { -webkit-tap-highlight-color: transparent; }
 #worship-view.theme-a .mini-nav {
   display: flex;
   gap: 6px;
-  padding: 0 22px 40px;
+  padding: 10px 22px 12px;
+  margin-bottom: 28px;
   overflow-x: auto;
   overflow-y: hidden;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
   scroll-padding-inline-start: 22px;
   scroll-padding-inline-end: 22px;
+
+  /* Stick beneath the top bar as the user scrolls past */
+  position: sticky;
+  top: 49px;
+  z-index: 15;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--rule);
 }
-/* Belt-and-suspenders: ensure the first/last pill respect the inset even
-   if the browser drops padding on the scrollable side. */
-#worship-view.theme-a .mini-pill:first-child { margin-inline-start: 0; }
 #worship-view.theme-a .mini-nav::after {
   content: '';
   flex: 0 0 1px;
