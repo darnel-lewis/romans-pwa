@@ -231,28 +231,6 @@ function applyViewState() {
   if (darkInd) darkInd.textContent = prefs.dark ? '☼' : '☾';
 }
 
-function formatDateA() {
-  const d = new Date();
-  return d.toLocaleDateString(undefined, {
-    weekday: 'long', month: 'long', day: 'numeric',
-  });
-}
-
-function formatDateB() {
-  const d = new Date();
-  const yyyy = d.getFullYear();
-  const mm = String(d.getMonth() + 1).padStart(2, '0');
-  const dd = String(d.getDate()).padStart(2, '0');
-  const day = d.toLocaleDateString(undefined, { weekday: 'long' });
-  const monthDay = d.toLocaleDateString(undefined, { month: 'long', day: 'numeric' });
-  return {
-    iso: `${yyyy}.${mm}.${dd} / ${day.slice(0, 3).toUpperCase()}`,
-    weekday: day,
-    pretty: d.toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' }),
-    combined: `${day} · ${monthDay}`.toUpperCase(),
-  };
-}
-
 function miniLabel(b) {
   if (b.kind === 'song') return b.title;
   if (b.kind === 'scripture') return b.reference;
@@ -318,17 +296,14 @@ function renderWorship() {
   const tbLeft = document.getElementById('topbar-left');
   tbLeft.textContent = "Today’s Worship";
 
+  // Header: H1 = church name, sub-line = subtitle (Style A only).
   const titleEl = document.getElementById('worship-title');
   titleEl.textContent = service.church || '';
 
-  // header
-  const dateEl = document.getElementById('hdr-date');
   const churchEl = document.getElementById('hdr-church');
   if (style === 'a') {
-    dateEl.textContent = formatDateB().combined;
     churchEl.textContent = (service.subtitle || '').trim() || 'Order of Service';
   } else {
-    dateEl.textContent = formatDateA();
     churchEl.textContent = '';
   }
 
