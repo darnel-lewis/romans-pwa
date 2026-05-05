@@ -178,7 +178,7 @@ button { -webkit-tap-highlight-color: transparent; }
 
 /* Theme A header */
 #worship-view.theme-a .worship-header {
-  padding: 56px 28px 40px;
+  padding: 56px 28px 56px;
 }
 #worship-view.theme-a .hdr-date { margin-bottom: 28px; }
 #worship-view.theme-a .worship-title {
@@ -186,6 +186,7 @@ button { -webkit-tap-highlight-color: transparent; }
   font-weight: 400;
   font-size: clamp(2.4rem, 9vw, 2.95rem);
   line-height: 1.05;
+  color: var(--accent);
 }
 #worship-view.theme-a .hdr-church { display: none; }
 #worship-view.theme-a .hdr-divider {
