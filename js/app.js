@@ -18,7 +18,7 @@ const STORAGE_KEYS = {
 const SEED_SERVICE = {
   church: 'The Well',
   style: 'a',
-  subtitle: 'Order of Service',
+  subtitle: '',
   footer: 'Soli Deo Gloria',
   blocks: [
     {
@@ -178,6 +178,18 @@ function setSession(session) {
 
 function clone(o) { return JSON.parse(JSON.stringify(o)); }
 
+/* Computes "Sunday · November 23" for the upcoming Sunday — used as the
+ * render-time fallback for an unset subtitle so the page always shows
+ * something date-like rather than a generic "Order of Service" stub. */
+function defaultSubtitle() {
+  const d = new Date();
+  const daysUntilSunday = (7 - d.getDay()) % 7 || 7;
+  d.setDate(d.getDate() + daysUntilSunday);
+  const day = d.toLocaleDateString(undefined, { weekday: 'long' });
+  const monthDay = d.toLocaleDateString(undefined, { month: 'long', day: 'numeric' });
+  return `${day} · ${monthDay}`;
+}
+
 /* ---------- routing ---------- */
 
 function route() {
@@ -302,7 +314,7 @@ function renderWorship() {
 
   const churchEl = document.getElementById('hdr-church');
   if (style === 'a') {
-    churchEl.textContent = (service.subtitle || '').trim() || 'Order of Service';
+    churchEl.textContent = (service.subtitle || '').trim() || defaultSubtitle();
   } else {
     churchEl.textContent = '';
   }
