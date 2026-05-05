@@ -1805,3 +1805,54 @@ body.modal-open { overflow: hidden; }
   .admin-tool { padding: .35rem .55rem; font-size: .78rem; }
   .signed-in { display: none; }
 }
+
+/* ============================================================
+   ADMIN — DATE PICKER + CUSTOM LABEL
+   ============================================================ */
+
+#service-date-input {
+  font-family: inherit;
+  font-size: 1rem;
+  padding: .65rem .75rem;
+  border: 1px solid #e8e2d6;
+  border-radius: 10px;
+  background: #fff;
+  color: #1a1a1a;
+  width: auto;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.date-preview {
+  font-size: .82rem;
+  color: #6b4f2a;
+  margin: .35rem 0 .25rem;
+  min-height: 1.1em;
+}
+
+.custom-label-section {
+  margin-top: .5rem;
+  border-top: 1px dashed #ece7da;
+  padding-top: .65rem;
+}
+.custom-label-section[open] { padding-top: .75rem; }
+.custom-label-section summary {
+  cursor: pointer;
+  user-select: none;
+  font-size: .82rem;
+  color: #6a6a6a;
+  padding: .15rem 0;
+  list-style: none;
+}
+.custom-label-section summary::-webkit-details-marker { display: none; }
+.custom-label-section summary::before {
+  content: '▸ ';
+  display: inline-block;
+  margin-right: .25rem;
+  transition: transform .15s;
+}
+.custom-label-section[open] summary::before { content: '▾ '; }
+.custom-label-section summary:hover { color: #1a1a1a; }
+.custom-label-section input[type="text"] {
+  margin-top: .5rem;
+}

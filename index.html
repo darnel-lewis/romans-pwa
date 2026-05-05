@@ -172,7 +172,7 @@
   <!-- Admin / editor view -->
   <section id="admin-view" class="view">
     <header class="admin-header">
-      <h2>Edit Today&rsquo;s Worship</h2>
+      <h2 id="admin-page-title">Edit service</h2>
       <div class="admin-actions">
         <button class="admin-tool" data-action="toggle-panel" data-panel="settings">Settings</button>
         <button class="admin-tool" data-action="toggle-panel" data-panel="library">Library</button>
@@ -186,9 +186,15 @@
 
       <!-- Service date — always visible -->
       <div class="item-card date-card">
-        <label for="subtitle-text">Service date</label>
-        <input type="text" id="subtitle-text" placeholder="e.g. Sunday Morning · November 23">
-        <div class="field-hint">Shown under the church name. Leave blank to auto-fill with the upcoming Sunday's date.</div>
+        <label for="service-date-input">Service date</label>
+        <input type="date" id="service-date-input">
+        <div class="date-preview" id="date-preview"></div>
+
+        <details class="custom-label-section" id="custom-label-section">
+          <summary>Use a custom label instead</summary>
+          <input type="text" id="subtitle-text" placeholder="e.g. Easter Sunday · April 5">
+          <div class="field-hint">Overrides the auto-formatted date on the public page.</div>
+        </details>
       </div>
 
       <div class="editor-toolbar">
