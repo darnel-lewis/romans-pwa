@@ -8,7 +8,7 @@
  *     and are slow on cold loads.
  */
 
-const CACHE_NAME = 'worship-pwa-v4';
+const CACHE_NAME = 'worship-pwa-v5';
 
 const PRECACHE = [
   '/',

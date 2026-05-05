@@ -745,7 +745,8 @@ function renderAdmin() {
   document.getElementById('footer-text').value = draft.footer || '';
   paintStylePicker();
   paintEditor();
-  renderAdminShare();
+  // Share QR is generated lazily when the Share modal opens (togglePanel),
+  // not on every admin load — keeps it out of the DOM until needed.
 }
 
 function paintStylePicker() {
