@@ -1474,3 +1474,165 @@ textarea { resize: vertical; min-height: 180px; line-height: 1.6; font-family: u
   margin-bottom: .75rem;
 }
 .library-actions .btn { padding: .5rem .85rem; font-size: .85rem; }
+
+/* ============================================================
+   ADMIN — MODALS, COLLAPSED CARDS, MEMBERS, EDITOR TOOLBAR
+   ============================================================ */
+
+/* Modal overlay */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(15, 15, 15, 0.45);
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 6vh 1rem 1rem;
+  overflow-y: auto;
+}
+.modal-overlay[hidden] { display: none; }
+body.modal-open { overflow: hidden; }
+
+.modal-card {
+  background: #fff;
+  border-radius: 14px;
+  width: 100%;
+  max-width: 520px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 12vh);
+  max-height: calc(100dvh - 12vh);
+}
+
+.modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #ece7da;
+}
+.modal-head h3 {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+.modal-close {
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  color: #4a4a4a;
+  padding: 0 .25rem;
+}
+.modal-close:hover { color: #1a1a1a; }
+
+.modal-body {
+  padding: 1rem 1.25rem 1.25rem;
+  overflow-y: auto;
+}
+
+/* Editor toolbar above the song-editor */
+.editor-toolbar {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  margin: .25rem 0 .75rem;
+  flex-wrap: wrap;
+}
+.editor-toolbar-label {
+  font-size: .75rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: #8a8a8a;
+  margin-right: auto;
+}
+
+/* Collapsible block cards */
+.item-card-summary {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: .9rem;
+  color: #4a4a4a;
+  margin: 0 .5rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.item-card.is-collapsed .item-card-body { display: none; }
+.item-card.is-collapsed { padding-bottom: .85rem; }
+.item-card.is-collapsed .item-card-num {
+  margin-right: .25rem;
+}
+.item-card-body { display: block; }
+
+/* Members section in Settings */
+.settings-divider {
+  height: 1px;
+  background: #ece7da;
+  margin: 1.25rem 0 .75rem;
+}
+.members-head {
+  display: flex;
+  align-items: baseline;
+  gap: .5rem;
+  margin-bottom: .5rem;
+}
+.members-title {
+  font-size: .78rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: #8a8a8a;
+  font-weight: 500;
+}
+.members-pending-tag {
+  font-size: .7rem;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  color: #b08840;
+  background: #fbf1de;
+  border-radius: 6px;
+  padding: 1px 6px;
+}
+.members-list {
+  display: flex;
+  flex-direction: column;
+  gap: .4rem;
+  margin-bottom: .65rem;
+}
+.member-row {
+  display: flex;
+  align-items: center;
+  padding: .55rem .75rem;
+  border: 1px solid #f1ead9;
+  border-radius: 10px;
+  background: #fafafa;
+}
+.member-info { flex: 1 1 auto; min-width: 0; }
+.member-email {
+  font-size: .92rem;
+  font-weight: 500;
+  color: #1a1a1a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.member-meta {
+  font-size: .76rem;
+  color: #8a8a8a;
+  margin-top: 1px;
+}
+
+.members-invite {
+  display: flex;
+  gap: .5rem;
+  align-items: center;
+  margin-top: .5rem;
+}
+.members-invite input { flex: 1 1 auto; }
+.members-invite .btn { padding: .55rem .85rem; font-size: .9rem; }
