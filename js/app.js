@@ -211,6 +211,11 @@ function route() {
     window.scrollTo(0, 0);
     return;
   }
+  if (hash === 'kiosk') {
+    document.getElementById('kiosk-view').classList.add('active');
+    renderKiosk();
+    return;
+  }
   document.getElementById('worship-view').classList.add('active');
   renderWorship();
 }
@@ -424,6 +429,10 @@ document.addEventListener('click', (e) => {
     p.size = Math.max(0, (p.size ?? 1) - 1);
     savePrefs(p);
     applyViewState();
+  } else if (action === 'kiosk-fullscreen') {
+    enterKioskMode();
+  } else if (action === 'email-link') {
+    emailKioskLink();
   }
 });
 
@@ -499,6 +508,7 @@ function renderAdmin() {
   document.getElementById('footer-text').value = draft.footer || '';
   paintStylePicker();
   paintEditor();
+  renderAdminShare();
 }
 
 function paintStylePicker() {
@@ -682,6 +692,123 @@ const logoutBtn = document.getElementById('logout-btn');
 if (logoutBtn) logoutBtn.addEventListener('click', () => {
   setSession(null);
   location.hash = '';
+});
+
+/* ============================================================
+   QR / KIOSK / SHARE
+   ============================================================ */
+
+/* The URL each church's QR encodes. Today everyone shares "/", but once
+ * slug routing lands this becomes origin + "/" + slug — change it in
+ * one place and every QR re-encodes correctly. */
+function publicUrl() {
+  return window.location.origin + '/';
+}
+
+function kioskUrl() {
+  return window.location.origin + '/#kiosk';
+}
+
+function prettyUrl(u) {
+  return u.replace(/^https?:\/\//, '').replace(/\/$/, '');
+}
+
+function renderQR(el, url, pixelSize) {
+  if (!el) return;
+  if (typeof qrcode !== 'function') {
+    el.textContent = '';
+    return;
+  }
+  const qr = qrcode(0, 'M');
+  qr.addData(url);
+  qr.make();
+  el.innerHTML = qr.createSvgTag({ scalable: true, margin: 0 });
+  const svg = el.querySelector('svg');
+  if (svg) {
+    svg.removeAttribute('width');
+    svg.removeAttribute('height');
+    svg.style.width = pixelSize + 'px';
+    svg.style.height = pixelSize + 'px';
+    svg.style.display = 'block';
+  }
+}
+
+function renderKiosk() {
+  const service = getService();
+  document.getElementById('kiosk-church').textContent = service.church || '';
+  const subtitleText = (service.subtitle || '').trim() || defaultSubtitle();
+  document.getElementById('kiosk-subtitle').textContent = subtitleText;
+  const url = publicUrl();
+  document.getElementById('kiosk-url').textContent = prettyUrl(url);
+  // Slight delay so the layout settles before sizing the SVG.
+  requestAnimationFrame(() => {
+    const target = document.getElementById('kiosk-qr');
+    const size = Math.min(420, Math.floor(Math.min(window.innerWidth, window.innerHeight) * 0.6));
+    renderQR(target, url, size);
+  });
+}
+
+function renderAdminShare() {
+  const url = publicUrl();
+  document.getElementById('admin-url').textContent = prettyUrl(url);
+  renderQR(document.getElementById('admin-qr'), url, 110);
+}
+
+/* Wake Lock + Fullscreen for the kiosk display. Both are best-effort —
+ * unsupported browsers just skip silently. */
+async function enterKioskMode() {
+  const root = document.documentElement;
+  try {
+    if (!document.fullscreenElement && root.requestFullscreen) {
+      await root.requestFullscreen();
+    }
+  } catch (_) { /* user gesture required, etc. — ignore */ }
+  try {
+    if ('wakeLock' in navigator && !window.__wakeLock) {
+      window.__wakeLock = await navigator.wakeLock.request('screen');
+      window.__wakeLock.addEventListener('release', () => { window.__wakeLock = null; });
+    }
+  } catch (_) { /* ignore */ }
+  const btn = document.getElementById('kiosk-fs-btn');
+  if (btn) btn.textContent = 'Awake · Fullscreen';
+}
+
+/* If the screen comes back from being hidden (user switched tabs and
+ * returned), re-acquire the wake lock — the spec releases it on hide. */
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState !== 'visible') return;
+  const view = document.getElementById('kiosk-view');
+  if (view && view.classList.contains('active') && 'wakeLock' in navigator) {
+    navigator.wakeLock.request('screen')
+      .then((lock) => { window.__wakeLock = lock; })
+      .catch(() => {});
+  }
+});
+
+function emailKioskLink() {
+  const service = getService();
+  const subject = `Today's Worship · ${service.church || ''}`.trim();
+  const body =
+    `Open this link on your tablet (or any phone) to display today's QR code for the congregation:\n\n` +
+    kioskUrl() + `\n\n` +
+    `Anyone who scans the code lands on the worship page:\n` + publicUrl();
+  window.location.href =
+    `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+
+/* Refresh the worship view when the user returns to the tab.
+ *
+ * Right now this just re-renders from localStorage (essentially a no-op
+ * since nothing changes locally). When the Supabase backend lands, this
+ * is the spot for stale-while-revalidate: keep showing the cached service
+ * immediately, fetch fresh data in the background, swap it in if the
+ * fetch succeeds. Scoped to the public view only — admins shouldn't have
+ * their draft blown away if they switch tabs mid-edit. */
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState !== 'visible') return;
+  const view = document.getElementById('worship-view');
+  if (!view || !view.classList.contains('active')) return;
+  renderWorship();
 });
 
 /* ---------- boot ---------- */

@@ -1031,3 +1031,151 @@ textarea { resize: vertical; min-height: 180px; line-height: 1.6; font-family: u
   font-size: 10px;
   opacity: 0.5;
 }
+
+/* ============================================================
+   KIOSK VIEW (big QR for tablets / shared screens)
+   ============================================================ */
+
+#kiosk-view {
+  background: #f7f5f0;
+  color: #15141a;
+  min-height: 100vh;
+  min-height: 100dvh;
+  font-family: 'Inter Tight', Inter, -apple-system, system-ui, sans-serif;
+  letter-spacing: -0.005em;
+  display: flex;
+}
+#kiosk-view.active { display: flex; }
+
+.kiosk-frame {
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 48px 28px env(safe-area-inset-bottom);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 24px;
+}
+
+.kiosk-header { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+
+.kiosk-wordmark {
+  font-family: 'Inter Tight', sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #85827a;
+}
+
+.kiosk-church {
+  margin: 4px 0 0;
+  font-weight: 500;
+  font-size: clamp(2rem, 5vw, 2.6rem);
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+}
+
+.kiosk-subtitle {
+  font-size: clamp(1rem, 2.4vw, 1.15rem);
+  color: rgba(21,20,26,0.55);
+}
+
+.kiosk-qr {
+  margin-top: 8px;
+  padding: 20px;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 12px 32px rgba(0,0,0,0.08);
+}
+.kiosk-qr svg path,
+.kiosk-qr svg rect { fill: #15141a; }
+
+.kiosk-caption {
+  font-size: clamp(1rem, 2.4vw, 1.15rem);
+  color: #15141a;
+  line-height: 1.45;
+}
+.kiosk-url {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.85em;
+  color: #85827a;
+  margin-top: 6px;
+  word-break: break-all;
+}
+
+.kiosk-controls {
+  margin-top: auto;
+  padding-top: 24px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.kiosk-back {
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 13px;
+  color: #85827a;
+  text-decoration: none;
+  padding: 6px 8px;
+}
+.kiosk-back:hover { color: #15141a; }
+
+/* ============================================================
+   ADMIN — SHARE CARD
+   ============================================================ */
+
+.share-row {
+  display: flex;
+  gap: 16px;
+  align-items: stretch;
+  flex-wrap: wrap;
+}
+
+.share-qr {
+  flex: 0 0 auto;
+  width: 110px;
+  height: 110px;
+  background: #fff;
+  border: 1px solid #e8e2d6;
+  border-radius: 12px;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.share-qr svg path,
+.share-qr svg rect { fill: #15141a; }
+
+.share-info {
+  flex: 1 1 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.share-label {
+  font-size: .72rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: #8a8a8a;
+}
+
+.share-url {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: .85rem;
+  color: #1a1a1a;
+  word-break: break-all;
+  line-height: 1.4;
+}
+
+.share-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+.share-actions .btn { padding: .5rem .85rem; font-size: .85rem; }
