@@ -366,10 +366,10 @@ function renderWorship() {
   setupMiniNavTracking();
 }
 
-/* Track active pill on scroll for theme B */
+/* Track active pill on scroll (style A / Modern only — it's the variant with the mini-nav) */
 function setupMiniNavTracking() {
   const view = document.getElementById('worship-view');
-  if (!view.classList.contains('theme-b')) return;
+  if (!view.classList.contains('theme-a')) return;
 
   const blocks = Array.from(document.querySelectorAll('#blocks .block'));
   const pills = Array.from(document.querySelectorAll('#mini-nav .mini-pill'));
