@@ -766,7 +766,7 @@ function togglePanel(name) {
     document.body.classList.add('modal-open');
     if (name === 'library') renderLibraryList();
     if (name === 'share') renderAdminShare();
-    if (name === 'settings') renderMembersList();
+    if (name === 'members') renderMembersList();
     const focusable = target.querySelector('input, button.modal-close');
     if (focusable) setTimeout(() => focusable.focus(), 50);
   } else {

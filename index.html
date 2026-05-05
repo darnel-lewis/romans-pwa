@@ -180,7 +180,9 @@
         <div class="admin-menu" id="admin-menu" hidden>
           <div class="admin-menu-email" id="signed-in-as"></div>
           <button type="button" class="admin-menu-item" data-action="toggle-panel" data-panel="settings">Settings</button>
-          <button type="button" class="admin-menu-item" data-action="toggle-panel" data-panel="library">Library</button>
+          <button type="button" class="admin-menu-item" data-action="toggle-panel" data-panel="library">Song library</button>
+          <button type="button" class="admin-menu-item" data-action="toggle-panel" data-panel="members">Members</button>
+          <button type="button" class="admin-menu-item" data-action="toggle-panel" data-panel="past-services">Past services</button>
           <div class="admin-menu-divider"></div>
           <button type="button" class="admin-menu-item" id="logout-btn">Sign out</button>
         </div>
@@ -259,10 +261,19 @@
           <input type="text" id="footer-text" placeholder="e.g. Soli Deo Gloria">
           <div class="field-hint">Shown at the bottom of the public page.</div>
 
-          <div class="settings-divider"></div>
+        </div>
+      </div>
+    </div>
 
+    <div class="modal-overlay" data-modal="members" hidden>
+      <div class="modal-card" role="dialog" aria-label="Members">
+        <div class="modal-head">
+          <h3>Members</h3>
+          <button type="button" class="modal-close" data-action="close-modal" aria-label="Close">×</button>
+        </div>
+        <div class="modal-body">
           <div class="members-head">
-            <span class="members-title">Members</span>
+            <span class="members-title">Editors</span>
             <span class="members-pending-tag">Coming with accounts</span>
           </div>
           <div class="members-list" id="members-list"></div>
@@ -271,17 +282,24 @@
             <button type="button" class="btn btn-ghost" data-action="invite-member">Send invite</button>
           </div>
           <div class="field-hint">Add co-editors so a backup leader can update next Sunday's service. Real invites will fire when accounts are live; for now this is a placeholder.</div>
+        </div>
+      </div>
+    </div>
 
-          <div class="settings-divider"></div>
-
+    <div class="modal-overlay" data-modal="past-services" hidden>
+      <div class="modal-card" role="dialog" aria-label="Past services">
+        <div class="modal-head">
+          <h3>Past services</h3>
+          <button type="button" class="modal-close" data-action="close-modal" aria-label="Close">×</button>
+        </div>
+        <div class="modal-body">
           <div class="members-head">
-            <span class="members-title">Past services</span>
+            <span class="members-title">Archive</span>
             <span class="members-pending-tag">Coming with accounts</span>
           </div>
           <div class="archive-stub">
-            Once accounts are live, every saved service is archived so you can revisit last week's set or duplicate one for next week. For now, use <strong>Download backup</strong> in the Library to save a snapshot.
+            Once accounts are live, every saved service is archived so you can revisit last week's set or duplicate one for next week. For now, use <strong>Download backup</strong> in the Song library to save a snapshot.
           </div>
-
         </div>
       </div>
     </div>
