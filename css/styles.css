@@ -213,7 +213,7 @@ button { -webkit-tap-highlight-color: transparent; }
 
 /* A (Modern) header */
 #worship-view.theme-a .worship-header {
-  padding: 36px 22px 22px;
+  padding: 36px 22px 12px;
   text-align: left;
 }
 #worship-view.theme-a .hdr-date {

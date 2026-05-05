@@ -52,24 +52,6 @@ const SEED_SERVICE = {
       ],
     },
     {
-      kind: 'scripture',
-      reference: 'Isaiah 6:1–4',
-      verses: [
-        { n: 1, text: 'In the year that King Uzziah died I saw the Lord sitting upon a throne, high and lifted up; and the train of his robe filled the temple.' },
-        { n: 2, text: 'Above him stood the seraphim. Each had six wings: with two he covered his face, and with two he covered his feet, and with two he flew.' },
-        { n: 3, text: 'And one called to another and said: “Holy, holy, holy is the Lord of hosts; the whole earth is full of his glory!”' },
-        { n: 4, text: 'And the foundations of the thresholds shook at the voice of him who called, and the house was filled with smoke.' },
-      ],
-    },
-    {
-      kind: 'note',
-      title: 'A Word Before We Begin',
-      body: [
-        'This morning we gather not because we have it all together, but because He does. Let the songs we sing become prayers, and the silences between them, listening.',
-        'If you are visiting, you belong here. If you are weary, you may rest. If you are joyful, sing loudly enough for the rest of us to remember why we came.',
-      ],
-    },
-    {
       kind: 'song',
       title: 'Amazing Grace',
       attribution: 'John Newton, 1779',
