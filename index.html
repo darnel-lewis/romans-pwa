@@ -30,9 +30,6 @@
         <button class="tb-btn size-down" data-action="size-down" aria-label="Smaller">A<span class="sub">−</span></button>
         <button class="tb-btn size-up" data-action="size-up" aria-label="Larger">A<span class="sub">+</span></button>
         <span class="tb-sep"></span>
-        <button class="tb-btn" data-action="toggle-style" aria-label="Toggle style">
-          <span class="style-indicator">A</span>
-        </button>
         <button class="tb-btn" data-action="toggle-dark" aria-label="Toggle dark mode">
           <span class="dark-indicator">☾</span>
         </button>
@@ -42,6 +39,11 @@
     <header class="worship-header">
       <div class="hdr-date" id="hdr-date"></div>
       <h1 class="worship-title">Today&rsquo;s Worship</h1>
+      <div class="hdr-divider" aria-hidden="true">
+        <span class="hdr-rule"></span>
+        <span class="hdr-ornament">❦</span>
+        <span class="hdr-rule"></span>
+      </div>
       <div class="hdr-church" id="hdr-church"></div>
     </header>
 
@@ -81,8 +83,25 @@
 
       <div class="item-card">
         <div class="item-card-head"><span class="item-card-num">Service</span></div>
+
         <label for="church-name">Church name</label>
         <input type="text" id="church-name" placeholder="e.g. The Well">
+
+        <label>Style</label>
+        <div class="style-picker" id="style-picker">
+          <button type="button" class="style-option" data-style="a">
+            <span class="style-option-label">A</span>
+            <span class="style-option-name">Quiet &amp; Contemplative</span>
+          </button>
+          <button type="button" class="style-option" data-style="b">
+            <span class="style-option-label">B</span>
+            <span class="style-option-name">Modern Minimal</span>
+          </button>
+        </div>
+
+        <label for="footer-text">Footer text</label>
+        <input type="text" id="footer-text" placeholder="e.g. Soli Deo Gloria">
+        <div class="field-hint">Shown at the bottom of the public page.</div>
       </div>
 
       <div id="song-editor"></div>

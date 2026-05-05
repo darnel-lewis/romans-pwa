@@ -174,6 +174,8 @@ button { -webkit-tap-highlight-color: transparent; }
   color: var(--muted);
 }
 
+.hdr-divider { display: none; }
+
 /* Theme A header */
 #worship-view.theme-a .worship-header {
   padding: 56px 28px 40px;
@@ -185,17 +187,24 @@ button { -webkit-tap-highlight-color: transparent; }
   font-size: clamp(2.4rem, 9vw, 2.95rem);
   line-height: 1.05;
 }
-#worship-view.theme-a .hdr-church {
-  margin-top: 28px;
-  display: inline-flex;
+#worship-view.theme-a .hdr-church { display: none; }
+#worship-view.theme-a .hdr-divider {
+  display: flex;
   align-items: center;
-  gap: 14px;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 36px;
 }
-#worship-view.theme-a .hdr-church::before,
-#worship-view.theme-a .hdr-church::after {
-  content: '';
-  width: 24px; height: 1px;
+#worship-view.theme-a .hdr-rule {
+  flex: 0 0 auto;
+  width: 64px;
+  height: 1px;
   background: var(--rule);
+}
+#worship-view.theme-a .hdr-ornament {
+  color: var(--accent);
+  font-size: 14px;
+  line-height: 1;
 }
 
 /* Theme B header */
@@ -234,9 +243,13 @@ button { -webkit-tap-highlight-color: transparent; }
   gap: 6px;
   padding: 0 22px 22px;
   overflow-x: auto;
+  overflow-y: hidden;
   scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x proximity;
 }
 #worship-view.theme-b .mini-nav::-webkit-scrollbar { display: none; }
+#worship-view.theme-b .mini-pill { scroll-snap-align: start; }
 
 .mini-pill {
   flex: 0 0 auto;
@@ -629,6 +642,41 @@ textarea { resize: vertical; min-height: 180px; line-height: 1.6; font-family: u
   text-transform: none;
   letter-spacing: 0;
   font-weight: 400;
+}
+
+.style-picker {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .5rem;
+  margin-bottom: .25rem;
+}
+.style-option {
+  background: #fff;
+  border: 1px solid #e8e2d6;
+  border-radius: 10px;
+  padding: .65rem .75rem;
+  cursor: pointer;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: .15rem;
+  font-family: inherit;
+  transition: border-color .15s, background .15s;
+}
+.style-option:hover { border-color: #c9b894; }
+.style-option.selected {
+  border-color: #6b4f2a;
+  background: #f1ead9;
+}
+.style-option-label {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #6b4f2a;
+}
+.style-option-name {
+  font-size: .82rem;
+  color: #4a4a4a;
 }
 
 .add-row {
