@@ -1,6 +1,7 @@
 /* Today's Worship — public view supports two styles (A & B) plus light/dark.
- * Theme tokens live on #worship-view; .theme-a / .theme-b switch the look,
- * .dark switches the palette, and [data-size] scales typography. */
+ * Theme tokens live on #worship-view; .theme-a (Modern Minimal) and
+ * .theme-b (Quiet & Contemplative) switch the look, .dark switches the
+ * palette, and [data-size] scales typography. */
 
 * { box-sizing: border-box; }
 
@@ -44,8 +45,8 @@ button { -webkit-tap-highlight-color: transparent; }
   transition: background .25s, color .25s;
 }
 
-/* ---- THEME A (Quiet & Contemplative) ---- */
-#worship-view.theme-a {
+/* ---- B · Quiet & Contemplative ---- */
+#worship-view.theme-b {
   --bg: #f5efe2;
   --surface: #ede5d2;
   --ink: #2a2520;
@@ -54,7 +55,7 @@ button { -webkit-tap-highlight-color: transparent; }
   --accent: #8a6a3a;
   font-family: 'Cormorant Garamond', 'EB Garamond', Georgia, serif;
 }
-#worship-view.theme-a.dark {
+#worship-view.theme-b.dark {
   --bg: #1a1816;
   --surface: #221f1c;
   --ink: #ece6da;
@@ -63,8 +64,8 @@ button { -webkit-tap-highlight-color: transparent; }
   --accent: #c9a96a;
 }
 
-/* ---- THEME B (Modern Minimal) ---- */
-#worship-view.theme-b {
+/* ---- A · Modern Minimal ---- */
+#worship-view.theme-a {
   --bg: #f7f5f0;
   --surface: #ffffff;
   --ink: #15141a;
@@ -75,7 +76,7 @@ button { -webkit-tap-highlight-color: transparent; }
   font-family: 'Inter Tight', Inter, -apple-system, system-ui, sans-serif;
   letter-spacing: -0.005em;
 }
-#worship-view.theme-b.dark {
+#worship-view.theme-a.dark {
   --bg: #0e0e10;
   --surface: #16161a;
   --ink: #f3f1ec;
@@ -86,13 +87,13 @@ button { -webkit-tap-highlight-color: transparent; }
 }
 
 /* Type sizes via data-size: 0=S 1=M 2=L. Each variant has its own base. */
-#worship-view.theme-a { font-size: 17px; line-height: 1.55; }
-#worship-view.theme-a[data-size="0"] { font-size: 15.6px; }
-#worship-view.theme-a[data-size="2"] { font-size: 19px; }
+#worship-view.theme-b { font-size: 17px; line-height: 1.55; }
+#worship-view.theme-b[data-size="0"] { font-size: 15.6px; }
+#worship-view.theme-b[data-size="2"] { font-size: 19px; }
 
-#worship-view.theme-b { font-size: 16px; line-height: 1.5; }
-#worship-view.theme-b[data-size="0"] { font-size: 14.7px; }
-#worship-view.theme-b[data-size="2"] { font-size: 17.9px; }
+#worship-view.theme-a { font-size: 16px; line-height: 1.5; }
+#worship-view.theme-a[data-size="0"] { font-size: 14.7px; }
+#worship-view.theme-a[data-size="2"] { font-size: 17.9px; }
 
 /* ---- Top bar (shared, themed via tokens) ---- */
 .topbar {
@@ -114,7 +115,7 @@ button { -webkit-tap-highlight-color: transparent; }
   color: var(--muted);
 }
 
-#worship-view.theme-b .topbar-left {
+#worship-view.theme-a .topbar-left {
   font-family: 'JetBrains Mono', ui-monospace, monospace;
   letter-spacing: 0.04em;
   text-transform: none;
@@ -143,7 +144,7 @@ button { -webkit-tap-highlight-color: transparent; }
 .tb-btn .style-indicator { font-weight: 600; font-size: 11px; letter-spacing: 0.04em; }
 .tb-btn .dark-indicator { font-size: 13px; }
 
-#worship-view.theme-b .tb-btn { color: var(--ink); font-weight: 600; }
+#worship-view.theme-a .tb-btn { color: var(--ink); font-weight: 600; }
 .size-down { font-size: 11px; }
 .size-up { font-size: 14px; }
 
@@ -176,44 +177,44 @@ button { -webkit-tap-highlight-color: transparent; }
 
 .hdr-divider { display: none; }
 
-/* Theme A header */
-#worship-view.theme-a .worship-header {
+/* B (Quiet) header */
+#worship-view.theme-b .worship-header {
   padding: 56px 28px 56px;
 }
-#worship-view.theme-a .hdr-date { margin-bottom: 28px; }
-#worship-view.theme-a .worship-title {
+#worship-view.theme-b .hdr-date { margin-bottom: 28px; }
+#worship-view.theme-b .worship-title {
   font-style: italic;
   font-weight: 400;
   font-size: clamp(2.4rem, 9vw, 2.95rem);
   line-height: 1.05;
   color: var(--accent);
 }
-#worship-view.theme-a .hdr-church { display: none; }
-#worship-view.theme-a .hdr-divider {
+#worship-view.theme-b .hdr-church { display: none; }
+#worship-view.theme-b .hdr-divider {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 16px;
   margin-top: 36px;
 }
-#worship-view.theme-a .hdr-rule {
+#worship-view.theme-b .hdr-rule {
   flex: 0 0 auto;
   width: 64px;
   height: 1px;
   background: var(--rule);
 }
-#worship-view.theme-a .hdr-ornament {
+#worship-view.theme-b .hdr-ornament {
   color: var(--accent);
   font-size: 14px;
   line-height: 1;
 }
 
-/* Theme B header */
-#worship-view.theme-b .worship-header {
+/* A (Modern) header */
+#worship-view.theme-a .worship-header {
   padding: 36px 22px 22px;
   text-align: left;
 }
-#worship-view.theme-b .hdr-date {
+#worship-view.theme-a .hdr-date {
   font-family: 'JetBrains Mono', ui-monospace, monospace;
   letter-spacing: 0.02em;
   text-transform: none;
@@ -222,13 +223,13 @@ button { -webkit-tap-highlight-color: transparent; }
   display: flex;
   justify-content: space-between;
 }
-#worship-view.theme-b .worship-title {
+#worship-view.theme-a .worship-title {
   font-weight: 500;
   font-size: clamp(2.1rem, 8vw, 2.5rem);
   letter-spacing: -0.035em;
   line-height: 1.0;
 }
-#worship-view.theme-b .hdr-church {
+#worship-view.theme-a .hdr-church {
   margin-top: 14px;
   font-family: 'Inter Tight', sans-serif;
   font-size: 14px;
@@ -237,9 +238,9 @@ button { -webkit-tap-highlight-color: transparent; }
   color: var(--dim);
 }
 
-/* ---- Mini-nav (theme B only) ---- */
+/* ---- Mini-nav (style A / Modern only) ---- */
 .mini-nav { display: none; }
-#worship-view.theme-b .mini-nav {
+#worship-view.theme-a .mini-nav {
   display: flex;
   gap: 6px;
   padding: 0 22px 22px;
@@ -249,8 +250,8 @@ button { -webkit-tap-highlight-color: transparent; }
   -webkit-overflow-scrolling: touch;
   scroll-snap-type: x proximity;
 }
-#worship-view.theme-b .mini-nav::-webkit-scrollbar { display: none; }
-#worship-view.theme-b .mini-pill { scroll-snap-align: start; }
+#worship-view.theme-a .mini-nav::-webkit-scrollbar { display: none; }
+#worship-view.theme-a .mini-pill { scroll-snap-align: start; }
 
 .mini-pill {
   flex: 0 0 auto;
@@ -275,10 +276,10 @@ button { -webkit-tap-highlight-color: transparent; }
 
 /* ---- Blocks container ---- */
 .blocks { padding: 0 22px 60px; }
-#worship-view.theme-a .blocks { padding: 0 28px 60px; }
+#worship-view.theme-b .blocks { padding: 0 28px 60px; }
 
 /* ---- Block separators ---- */
-#worship-view.theme-a .block + .block::before {
+#worship-view.theme-b .block + .block::before {
   content: '· · ·';
   display: block;
   text-align: center;
@@ -287,12 +288,12 @@ button { -webkit-tap-highlight-color: transparent; }
   letter-spacing: 0.6em;
   margin: 48px 0;
 }
-#worship-view.theme-b .block {
+#worship-view.theme-a .block {
   padding-top: 28px;
   padding-bottom: 28px;
 }
-#worship-view.theme-b .block + .block { border-top: 1px solid var(--rule); }
-#worship-view.theme-b .block:first-child { padding-top: 0; }
+#worship-view.theme-a .block + .block { border-top: 1px solid var(--rule); }
+#worship-view.theme-a .block:first-child { padding-top: 0; }
 
 /* ============================================================
    SONG BLOCK
@@ -307,41 +308,41 @@ button { -webkit-tap-highlight-color: transparent; }
   color: var(--muted);
 }
 
-/* Theme A: centered, serif, italic chorus in accent */
-#worship-view.theme-a .song-head { text-align: center; margin-bottom: 28px; }
-#worship-view.theme-a .song-title {
+/* B (Quiet): centered, serif, italic chorus in accent */
+#worship-view.theme-b .song-head { text-align: center; margin-bottom: 28px; }
+#worship-view.theme-b .song-title {
   font-weight: 500;
   font-size: clamp(1.55rem, 6vw, 1.85rem);
   letter-spacing: -0.005em;
   line-height: 1.15;
 }
-#worship-view.theme-a .song-attribution { margin-top: 8px; }
-#worship-view.theme-a .stanzas { text-align: center; }
-#worship-view.theme-a .stanza { margin-bottom: 22px; }
-#worship-view.theme-a .stanza.chorus {
+#worship-view.theme-b .song-attribution { margin-top: 8px; }
+#worship-view.theme-b .stanzas { text-align: center; }
+#worship-view.theme-b .stanza { margin-bottom: 22px; }
+#worship-view.theme-b .stanza.chorus {
   font-style: italic;
   color: var(--accent);
 }
 
-/* Theme B: left-aligned, sans, chorus has accent rule */
-#worship-view.theme-b .song-head { margin-bottom: 22px; }
-#worship-view.theme-b .song-title {
+/* A (Modern): left-aligned, sans, chorus has accent rule */
+#worship-view.theme-a .song-head { margin-bottom: 22px; }
+#worship-view.theme-a .song-title {
   font-weight: 500;
   font-size: clamp(1.4rem, 5.6vw, 1.6rem);
   letter-spacing: -0.025em;
   line-height: 1.1;
   margin-bottom: 4px;
 }
-#worship-view.theme-b .song-attribution {
+#worship-view.theme-a .song-attribution {
   font-family: 'Inter Tight', sans-serif;
   font-size: 12px;
   letter-spacing: 0;
   text-transform: none;
   color: var(--muted);
 }
-#worship-view.theme-b .stanzas { color: var(--dim); }
-#worship-view.theme-b .stanza { margin-bottom: 18px; line-height: 1.5; }
-#worship-view.theme-b .stanza.chorus {
+#worship-view.theme-a .stanzas { color: var(--dim); }
+#worship-view.theme-a .stanza { margin-bottom: 18px; line-height: 1.5; }
+#worship-view.theme-a .stanza.chorus {
   padding-left: 16px;
   border-left: 2px solid var(--ink);
   color: var(--ink);
@@ -361,12 +362,12 @@ button { -webkit-tap-highlight-color: transparent; }
   vertical-align: super;
 }
 
-/* Theme A: centered ref label + accent reference, prose with text indent */
-#worship-view.theme-a .scripture-head {
+/* B (Quiet): accent reference, prose with text indent */
+#worship-view.theme-b .scripture-head {
   text-align: center;
   margin-bottom: 22px;
 }
-#worship-view.theme-a .scripture-eyebrow {
+#worship-view.theme-b .scripture-eyebrow {
   font-family: 'Inter', sans-serif;
   font-size: 10px;
   letter-spacing: 0.28em;
@@ -374,39 +375,39 @@ button { -webkit-tap-highlight-color: transparent; }
   color: var(--muted);
   margin-bottom: 6px;
 }
-#worship-view.theme-a .scripture-reference {
+#worship-view.theme-b .scripture-reference {
   font-style: italic;
   font-size: clamp(1.15rem, 4.5vw, 1.3rem);
   color: var(--accent);
 }
-#worship-view.theme-a .scripture-prose {
+#worship-view.theme-b .scripture-prose {
   text-indent: 1.6em;
   text-align: left;
 }
-#worship-view.theme-a .verse-num {
+#worship-view.theme-b .verse-num {
   font-size: 0.62em;
   color: var(--accent);
 }
 
-/* Theme B: mono eyebrow, weight ref, smaller prose */
-#worship-view.theme-b .scripture-eyebrow {
+/* A (Modern): weight ref, prose with mono verse numbers */
+#worship-view.theme-a .scripture-eyebrow {
   font-family: 'JetBrains Mono', ui-monospace, monospace;
   font-size: 10px;
   letter-spacing: 0.02em;
   color: var(--muted);
   margin-bottom: 10px;
 }
-#worship-view.theme-b .scripture-reference {
+#worship-view.theme-a .scripture-reference {
   font-size: clamp(1.15rem, 4.6vw, 1.3rem);
   letter-spacing: -0.02em;
   margin-bottom: 18px;
 }
-#worship-view.theme-b .scripture-prose {
+#worship-view.theme-a .scripture-prose {
   color: var(--ink);
   line-height: 1.55;
   text-wrap: pretty;
 }
-#worship-view.theme-b .verse-num {
+#worship-view.theme-a .verse-num {
   font-family: 'JetBrains Mono', ui-monospace, monospace;
   font-size: 0.7em;
   color: var(--muted);
@@ -424,43 +425,43 @@ button { -webkit-tap-highlight-color: transparent; }
 .note-card p { margin: 0 0 14px; text-wrap: pretty; }
 .note-card p:last-child { margin-bottom: 0; }
 
-/* Theme A: surface with left accent rule */
-#worship-view.theme-a .note-card {
+/* B (Quiet): surface with left accent rule */
+#worship-view.theme-b .note-card {
   background: var(--surface);
   border-radius: 4px;
   padding: 28px 26px;
   border-left: 2px solid var(--accent);
 }
-#worship-view.theme-a .note-title {
+#worship-view.theme-b .note-title {
   font-style: italic;
   font-size: clamp(1.15rem, 4.5vw, 1.3rem);
   letter-spacing: -0.005em;
 }
 
-/* Theme B: rounded card with eyebrow */
-#worship-view.theme-b .note-card {
+/* A (Modern): rounded card */
+#worship-view.theme-a .note-card {
   background: var(--surface);
   border-radius: 14px;
   padding: 20px 18px;
   border: 1px solid var(--rule);
 }
-#worship-view.theme-b .note-eyebrow {
+#worship-view.theme-a .note-eyebrow {
   font-family: 'JetBrains Mono', ui-monospace, monospace;
   font-size: 10px;
   letter-spacing: 0.02em;
   color: var(--muted);
   margin-bottom: 10px;
 }
-#worship-view.theme-b .note-title {
+#worship-view.theme-a .note-title {
   font-size: clamp(1.05rem, 4vw, 1.15rem);
   letter-spacing: -0.02em;
 }
-#worship-view.theme-b .note-card p {
+#worship-view.theme-a .note-card p {
   color: var(--dim);
   font-size: 14.5px;
   line-height: 1.5;
 }
-#worship-view.theme-a .note-eyebrow { display: none; }
+#worship-view.theme-b .note-eyebrow { display: none; }
 
 /* ============================================================
    FOOTER
@@ -473,14 +474,14 @@ button { -webkit-tap-highlight-color: transparent; }
   color: var(--muted);
 }
 
-#worship-view.theme-a .worship-footer {
+#worship-view.theme-b .worship-footer {
   font-size: 10px;
   letter-spacing: 0.3em;
   text-transform: uppercase;
   margin-top: 16px;
 }
 
-#worship-view.theme-b .worship-footer {
+#worship-view.theme-a .worship-footer {
   font-family: 'JetBrains Mono', ui-monospace, monospace;
   font-size: 10px;
   letter-spacing: 0.12em;
