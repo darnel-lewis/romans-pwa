@@ -421,7 +421,7 @@ document.addEventListener('click', (e) => {
     applyViewState();
   } else if (action === 'size-up') {
     const p = getPrefs();
-    p.size = Math.min(2, (p.size ?? 1) + 1);
+    p.size = Math.min(3, (p.size ?? 1) + 1);
     savePrefs(p);
     applyViewState();
   } else if (action === 'size-down') {

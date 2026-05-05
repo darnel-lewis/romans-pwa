@@ -86,14 +86,16 @@ button { -webkit-tap-highlight-color: transparent; }
   --dim: rgba(243,241,236,0.5);
 }
 
-/* Type sizes via data-size: 0=S 1=M 2=L. Each variant has its own base. */
+/* Type sizes via data-size: 0=S 1=M 2=L 3=XL. Each variant has its own base. */
 #worship-view.theme-b { font-size: 17px; line-height: 1.55; }
 #worship-view.theme-b[data-size="0"] { font-size: 15.6px; }
 #worship-view.theme-b[data-size="2"] { font-size: 19px; }
+#worship-view.theme-b[data-size="3"] { font-size: 22px; }
 
 #worship-view.theme-a { font-size: 16px; line-height: 1.5; }
 #worship-view.theme-a[data-size="0"] { font-size: 14.7px; }
 #worship-view.theme-a[data-size="2"] { font-size: 17.9px; }
+#worship-view.theme-a[data-size="3"] { font-size: 20.5px; }
 
 /* ---- Top bar (shared, themed via tokens) ---- */
 .topbar {
