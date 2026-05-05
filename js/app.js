@@ -539,8 +539,62 @@ document.addEventListener('click', (e) => {
     enterKioskMode();
   } else if (action === 'email-link') {
     emailKioskLink();
+  } else if (action === 'toggle-panel') {
+    togglePanel(t.dataset.panel);
+  } else if (action === 'library-delete') {
+    libraryDelete(t.dataset.libraryKey);
   }
 });
+
+/* ---------- admin panels (Settings / Library / Share) ----------
+ * One open at a time. Re-clicking the toggle closes the panel. */
+function togglePanel(name) {
+  const panels = document.querySelectorAll('.admin-panel');
+  let opened = false;
+  panels.forEach((el) => {
+    if (el.dataset.panelName === name) {
+      const wasHidden = el.hasAttribute('hidden');
+      if (wasHidden) {
+        el.removeAttribute('hidden');
+        opened = true;
+      } else {
+        el.setAttribute('hidden', '');
+      }
+    } else {
+      el.setAttribute('hidden', '');
+    }
+  });
+  document.querySelectorAll('.admin-tool').forEach((btn) => {
+    btn.classList.toggle('is-active', opened && btn.dataset.panel === name);
+  });
+  if (opened && name === 'library') renderLibraryList();
+  if (opened && name === 'share') renderAdminShare();
+}
+
+function renderLibraryList() {
+  const el = document.getElementById('library-list');
+  if (!el) return;
+  const lib = [...getSongLibrary()].sort((a, b) => (b.lastUsed || 0) - (a.lastUsed || 0));
+  if (!lib.length) {
+    el.innerHTML = `<div class="library-empty">No saved songs yet. Add a song below and save — it'll show up here.</div>`;
+    return;
+  }
+  el.innerHTML = lib.map((s) => `
+    <div class="library-item">
+      <div class="library-item-info">
+        <div class="library-item-title">${esc(s.title)}</div>
+        ${s.attribution ? `<div class="library-item-meta">${esc(s.attribution)}</div>` : ''}
+      </div>
+      <button type="button" class="remove-btn" data-action="library-delete" data-library-key="${escAttr(normalizeTitle(s.title))}">Delete</button>
+    </div>
+  `).join('');
+}
+
+function libraryDelete(key) {
+  const lib = getSongLibrary().filter((s) => normalizeTitle(s.title) !== key);
+  saveSongLibrary(lib);
+  renderLibraryList();
+}
 
 /* ---------- login (mock magic link) ---------- */
 
@@ -706,6 +760,7 @@ function paintEditor() {
     return `
       <div class="item-card" data-index="${i}">
         <div class="item-card-head">
+          <span class="drag-handle" aria-label="Drag to reorder" title="Drag to reorder">⋮⋮</span>
           <span class="item-card-num">${esc(cfg.label)} · ${i + 1}</span>
           <div class="item-card-actions">
             <button type="button" class="icon-btn" data-action="up" data-index="${i}" ${first ? 'disabled' : ''} aria-label="Move up">↑</button>
@@ -735,6 +790,27 @@ function paintEditor() {
       </div>
     `;
   }).join('');
+  initSortable();
+}
+
+function initSortable() {
+  const editor = editorEl();
+  if (!editor || typeof Sortable === 'undefined') return;
+  if (editor.__sortable) {
+    try { editor.__sortable.destroy(); } catch (_) {}
+  }
+  editor.__sortable = Sortable.create(editor, {
+    handle: '.drag-handle',
+    animation: 160,
+    ghostClass: 'item-card-ghost',
+    chosenClass: 'item-card-chosen',
+    onEnd: (evt) => {
+      if (evt.oldIndex === evt.newIndex || evt.oldIndex == null) return;
+      const [moved] = draft.blocks.splice(evt.oldIndex, 1);
+      draft.blocks.splice(evt.newIndex, 0, moved);
+      paintEditor();
+    },
+  });
 }
 
 document.addEventListener('input', (e) => {

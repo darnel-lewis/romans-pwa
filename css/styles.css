@@ -1361,3 +1361,108 @@ textarea { resize: vertical; min-height: 180px; line-height: 1.6; font-family: u
   color: #8a8a8a;
   margin-top: 2px;
 }
+
+/* ============================================================
+   ADMIN — TOOLBAR + PANELS + LIBRARY + DRAG
+   ============================================================ */
+
+/* Compact toolbar buttons in the admin header */
+.admin-tool {
+  font-family: inherit;
+  font-size: .82rem;
+  font-weight: 500;
+  background: transparent;
+  color: #4a4a4a;
+  border: 1px solid #e8e2d6;
+  border-radius: 8px;
+  padding: .4rem .7rem;
+  cursor: pointer;
+}
+.admin-tool:hover { background: #fff; }
+.admin-tool.is-active {
+  background: #1a1a1a;
+  color: #fff;
+  border-color: #1a1a1a;
+}
+
+/* Always-visible date card — gentle emphasis */
+.date-card { border-color: #d8d2c4; }
+
+/* Toggleable panels collapse via the [hidden] attribute */
+.admin-panel[hidden] { display: none; }
+
+/* Library list */
+.library-hint {
+  font-size: .75rem;
+  color: #8a8a8a;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.library-list {
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+}
+
+.library-empty {
+  color: #8a8a8a;
+  font-size: .9rem;
+  padding: 1rem 0;
+}
+
+.library-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem;
+  padding: .65rem .75rem;
+  border: 1px solid #f1ead9;
+  border-radius: 10px;
+  background: #fafafa;
+}
+.library-item-info { flex: 1 1 auto; min-width: 0; }
+.library-item-title {
+  font-size: .95rem;
+  font-weight: 500;
+  color: #1a1a1a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.library-item-meta {
+  font-size: .78rem;
+  color: #8a8a8a;
+  margin-top: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Drag handle */
+.drag-handle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  margin-right: .25rem;
+  color: #b8b3a8;
+  cursor: grab;
+  font-size: .9rem;
+  letter-spacing: -2px;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+.drag-handle:active { cursor: grabbing; }
+
+/* Sortable visual states */
+.item-card-ghost {
+  opacity: .35;
+  background: #f1ead9;
+}
+.item-card-chosen {
+  box-shadow: 0 6px 24px rgba(0,0,0,0.08);
+}

@@ -174,6 +174,9 @@
     <header class="admin-header">
       <h2>Edit Today&rsquo;s Worship</h2>
       <div class="admin-actions">
+        <button class="admin-tool" data-action="toggle-panel" data-panel="settings">Settings</button>
+        <button class="admin-tool" data-action="toggle-panel" data-panel="library">Library</button>
+        <button class="admin-tool" data-action="toggle-panel" data-panel="share">Share</button>
         <span class="signed-in" id="signed-in-as"></span>
         <button class="btn btn-ghost" id="logout-btn">Sign out</button>
       </div>
@@ -181,8 +184,16 @@
 
     <div class="admin-body">
 
-      <div class="item-card">
-        <div class="item-card-head"><span class="item-card-num">Service</span></div>
+      <!-- Service date — always visible -->
+      <div class="item-card date-card">
+        <label for="subtitle-text">Service date</label>
+        <input type="text" id="subtitle-text" placeholder="e.g. Sunday Morning · November 23">
+        <div class="field-hint">Shown under the church name. Leave blank to auto-fill with the upcoming Sunday's date.</div>
+      </div>
+
+      <!-- Settings — toggleable -->
+      <div class="item-card admin-panel" data-panel-name="settings" hidden>
+        <div class="item-card-head"><span class="item-card-num">Settings</span></div>
 
         <label for="church-name">Church name</label>
         <input type="text" id="church-name" placeholder="e.g. The Well">
@@ -199,16 +210,22 @@
           </button>
         </div>
 
-        <label for="subtitle-text">Subtitle</label>
-        <input type="text" id="subtitle-text" placeholder="e.g. Sunday Morning · November 23">
-        <div class="field-hint">Shown under the church name in Style A. Leave blank to auto-fill with the upcoming Sunday's date.</div>
-
         <label for="footer-text">Footer text</label>
         <input type="text" id="footer-text" placeholder="e.g. Soli Deo Gloria">
         <div class="field-hint">Shown at the bottom of the public page.</div>
       </div>
 
-      <div class="item-card">
+      <!-- Library — toggleable -->
+      <div class="item-card admin-panel" data-panel-name="library" hidden>
+        <div class="item-card-head">
+          <span class="item-card-num">Song library</span>
+          <span class="library-hint">Songs you save are kept here. Tap delete to remove.</span>
+        </div>
+        <div id="library-list" class="library-list"></div>
+      </div>
+
+      <!-- Share — toggleable -->
+      <div class="item-card admin-panel" data-panel-name="share" hidden>
         <div class="item-card-head"><span class="item-card-num">Share</span></div>
         <div class="share-row">
           <div class="share-qr" id="admin-qr" aria-label="QR code preview"></div>
@@ -241,6 +258,7 @@
   </section>
 
   <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   <script src="/js/app.js"></script>
 
   <script>
