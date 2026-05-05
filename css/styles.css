@@ -53,6 +53,16 @@ button { -webkit-tap-highlight-color: transparent; }
   --muted: #8a7e6a;
   --rule: rgba(29,24,18,0.14);
   --accent: #8a6a3a;
+  /* Body in Inter (matches Style A's tight tracking); titles override
+   * back to Cormorant for the serif/chapel feel. */
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  letter-spacing: -0.005em;
+}
+#worship-view.theme-b .worship-title,
+#worship-view.theme-b .song-title,
+#worship-view.theme-b .scripture-reference,
+#worship-view.theme-b .scripture-version,
+#worship-view.theme-b .note-title {
   font-family: 'Cormorant Garamond', 'EB Garamond', Georgia, serif;
 }
 #worship-view.theme-b.dark {
