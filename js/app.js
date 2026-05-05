@@ -254,12 +254,32 @@ function miniLabel(b) {
   return b.title;
 }
 
-function renderSong(b) {
-  const stanzas = (b.stanzas || []).map((st) => `
-    <div class="stanza ${st.type === 'chorus' ? 'chorus' : ''}">
-      ${(st.lines || []).map((ln) => `<div>${esc(ln)}</div>`).join('')}
-    </div>
-  `).join('');
+function renderSong(b, style) {
+  const condense = style === 'a';
+  let renderedChorus = false;
+  const stanzas = (b.stanzas || []).map((st) => {
+    if (st.type === 'chorus') {
+      if (condense && renderedChorus) {
+        return `
+          <div class="chorus-repeat" aria-label="Chorus repeats">
+            <span class="chorus-repeat-dot"></span>
+            <span class="chorus-repeat-label">repeat</span>
+          </div>
+        `;
+      }
+      renderedChorus = true;
+      return `
+        <div class="stanza chorus">
+          ${(st.lines || []).map((ln) => `<div>${esc(ln)}</div>`).join('')}
+        </div>
+      `;
+    }
+    return `
+      <div class="stanza">
+        ${(st.lines || []).map((ln) => `<div>${esc(ln)}</div>`).join('')}
+      </div>
+    `;
+  }).join('');
   return `
     <article class="block block-song">
       <div class="song-head">
@@ -271,7 +291,23 @@ function renderSong(b) {
   `;
 }
 
-function renderScripture(b) {
+function renderScripture(b, style) {
+  if (style === 'a') {
+    const rows = (b.verses || []).map((v) => `
+      <div class="verse-row">
+        <div class="verse-num">${esc(v.n)}</div>
+        <div class="verse-text">${esc(v.text)}</div>
+      </div>
+    `).join('');
+    return `
+      <article class="block block-scripture">
+        <div class="scripture-head">
+          <h2 class="scripture-reference">${esc(b.reference || '')}</h2>
+        </div>
+        <div class="verses">${rows}</div>
+      </article>
+    `;
+  }
   const verses = (b.verses || []).map((v) =>
     `<sup class="verse-num">${esc(v.n)}</sup>${esc(v.text)} `
   ).join('');
@@ -285,7 +321,7 @@ function renderScripture(b) {
   `;
 }
 
-function renderNote(b) {
+function renderNote(b, _style) {
   const paras = (b.body || []).map((p) => `<p>${esc(p)}</p>`).join('');
   return `
     <article class="block block-note">
@@ -297,10 +333,10 @@ function renderNote(b) {
   `;
 }
 
-function renderBlock(b) {
-  if (b.kind === 'song') return renderSong(b);
-  if (b.kind === 'scripture') return renderScripture(b);
-  if (b.kind === 'note') return renderNote(b);
+function renderBlock(b, style) {
+  if (b.kind === 'song') return renderSong(b, style);
+  if (b.kind === 'scripture') return renderScripture(b, style);
+  if (b.kind === 'note') return renderNote(b, style);
   return '';
 }
 
@@ -335,7 +371,7 @@ function renderWorship() {
   if (!service.blocks || !service.blocks.length) {
     container.innerHTML = `<div class="empty">Nothing has been added yet.</div>`;
   } else {
-    container.innerHTML = service.blocks.map(renderBlock).join('');
+    container.innerHTML = service.blocks.map((b) => renderBlock(b, style)).join('');
   }
 
   // footer (custom text used by both styles; rendered with each variant's treatment)

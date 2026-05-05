@@ -66,24 +66,30 @@ button { -webkit-tap-highlight-color: transparent; }
 
 /* ---- A · Modern Minimal ---- */
 #worship-view.theme-a {
-  --bg: #f7f5f0;
-  --surface: #ffffff;
-  --ink: #15141a;
-  --muted: #85827a;
-  --rule: rgba(21,20,26,0.10);
-  --accent: #15141a;
-  --dim: rgba(21,20,26,0.55);
-  font-family: 'Inter Tight', Inter, -apple-system, system-ui, sans-serif;
+  --bg: #F7F6F3;
+  --surface: #FCFBF8;
+  --ink: #101113;
+  --ink-70: #2D3036;
+  --muted: #5A5F66;
+  --rule: #E4E2DC;
+  --rule-soft: #ECEAE3;
+  --accent: #1F4D4A;
+  --accent-soft: #E6EEEC;
+  --dim: rgba(16,17,19,0.55);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
   letter-spacing: -0.005em;
 }
 #worship-view.theme-a.dark {
-  --bg: #0e0e10;
-  --surface: #16161a;
-  --ink: #f3f1ec;
-  --muted: #7a7a82;
-  --rule: rgba(243,241,236,0.10);
-  --accent: #f3f1ec;
-  --dim: rgba(243,241,236,0.5);
+  --bg: #0E1011;
+  --surface: #16191B;
+  --ink: #F2F1EC;
+  --ink-70: #C4C7CB;
+  --muted: #8B9099;
+  --rule: rgba(242,241,236,0.10);
+  --rule-soft: rgba(242,241,236,0.06);
+  --accent: #7DB3AE;
+  --accent-soft: rgba(125,179,174,0.12);
+  --dim: rgba(242,241,236,0.55);
 }
 
 /* Type sizes via data-size: 0=S 1=M 2=L 3=XL. Each variant has its own base. */
@@ -118,12 +124,12 @@ button { -webkit-tap-highlight-color: transparent; }
 }
 
 #worship-view.theme-a .topbar-left {
-  font-family: 'Inter Tight', Inter, -apple-system, system-ui, sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
   font-weight: 600;
-  font-size: 11px;
+  font-size: 11.5px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--ink);
+  color: var(--ink-70);
 }
 
 .topbar-right { display: flex; align-items: center; gap: 4px; }
@@ -151,6 +157,17 @@ button { -webkit-tap-highlight-color: transparent; }
 #worship-view.theme-a .tb-btn { color: var(--ink); font-weight: 600; }
 .size-down { font-size: 11px; }
 .size-up { font-size: 14px; }
+
+#worship-view.theme-a .size-down {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+}
+#worship-view.theme-a .size-up {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ink);
+}
 
 .tb-sep { width: 1px; align-self: stretch; background: var(--rule); margin: 4px 4px; }
 
@@ -206,24 +223,29 @@ button { -webkit-tap-highlight-color: transparent; }
 
 /* A (Modern) header */
 #worship-view.theme-a .worship-header {
-  padding: 36px 22px 12px;
+  padding: 32px 22px 22px;
   text-align: left;
+  display: flex;
+  flex-direction: column;
 }
 #worship-view.theme-a .worship-title {
-  font-weight: 500;
-  font-size: clamp(2.1rem, 8vw, 2.5rem);
-  letter-spacing: -0.035em;
+  order: 2;
+  font-weight: 700;
+  font-size: clamp(2.4rem, 11vw, 3.25rem);
+  letter-spacing: -0.04em;
   line-height: 1.0;
 }
 #worship-view.theme-a .hdr-church {
-  margin-top: 18px;
-  font-family: 'Inter Tight', sans-serif;
-  font-size: clamp(1.1rem, 2.8vw, 1.3rem);
-  font-weight: 400;
-  letter-spacing: -0.015em;
-  text-transform: none;
-  color: var(--ink);
+  order: 1;
+  margin: 0 0 14px;
+  font-family: 'Inter', sans-serif;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
 }
+#worship-view.theme-a .hdr-divider { display: none; }
 
 /* ---- Mini-nav (style A / Modern only) ---- */
 .mini-nav { display: none; }
@@ -273,6 +295,12 @@ button { -webkit-tap-highlight-color: transparent; }
   background: var(--ink);
   color: var(--bg);
   border-color: var(--ink);
+}
+
+#worship-view.theme-a .mini-pill {
+  padding: 9px 16px;
+  font-size: 13px;
+  color: var(--ink-70);
 }
 
 /* ---- Blocks container ---- */
@@ -326,26 +354,61 @@ button { -webkit-tap-highlight-color: transparent; }
 }
 
 /* A (Modern): left-aligned, sans, chorus has accent rule */
-#worship-view.theme-a .song-head { margin-bottom: 22px; }
+#worship-view.theme-a .song-head { margin-bottom: 26px; }
 #worship-view.theme-a .song-title {
-  font-weight: 500;
-  font-size: clamp(1.4rem, 5.6vw, 1.6rem);
-  letter-spacing: -0.025em;
+  font-weight: 700;
+  font-size: clamp(1.5rem, 5.6vw, 1.625rem);
+  letter-spacing: -0.04em;
   line-height: 1.1;
   margin-bottom: 4px;
 }
 #worship-view.theme-a .song-attribution {
-  font-family: 'Inter Tight', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 12px;
-  letter-spacing: 0;
+  font-weight: 500;
+  letter-spacing: 0.03em;
   text-transform: none;
   color: var(--muted);
 }
-#worship-view.theme-a .stanzas { color: var(--dim); }
-#worship-view.theme-a .stanza { margin-bottom: 18px; line-height: 1.5; }
+#worship-view.theme-a .stanzas { color: var(--ink); }
+#worship-view.theme-a .stanza {
+  margin-bottom: 22px;
+  font-size: 1.125em;
+  line-height: 1.55;
+  font-weight: 400;
+  letter-spacing: -0.005em;
+}
 #worship-view.theme-a .stanza.chorus {
+  position: relative;
+  padding-left: 16px;
+  border-left: 3px solid var(--accent);
+  font-weight: 600;
   color: var(--ink);
 }
+
+/* Chorus repeat marker — appears for any chorus stanza after the first.
+ * Same accent rule, but body collapsed to a small "repeat" tag. */
+#worship-view.theme-a .chorus-repeat {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-left: 16px;
+  border-left: 3px solid var(--accent);
+  margin: 4px 0 22px;
+}
+#worship-view.theme-a .chorus-repeat-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+#worship-view.theme-a .chorus-repeat-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+  letter-spacing: 0;
+}
+#worship-view.theme-b .chorus-repeat { display: none; }
 
 /* ============================================================
    SCRIPTURE BLOCK
@@ -387,31 +450,48 @@ button { -webkit-tap-highlight-color: transparent; }
   color: var(--accent);
 }
 
-/* A (Modern): weight ref, prose with mono verse numbers */
-#worship-view.theme-a .scripture-eyebrow {
-  font-family: 'JetBrains Mono', ui-monospace, monospace;
-  font-size: 10px;
-  letter-spacing: 0.02em;
-  color: var(--muted);
-  margin-bottom: 10px;
-}
+/* A (Modern): hanging verse layout — reference, then verses one per row */
+#worship-view.theme-a .scripture-eyebrow { display: none; }
+#worship-view.theme-a .scripture-head { margin-bottom: 24px; }
 #worship-view.theme-a .scripture-reference {
-  font-size: clamp(1.15rem, 4.6vw, 1.3rem);
-  letter-spacing: -0.02em;
-  margin-bottom: 18px;
-}
-#worship-view.theme-a .scripture-prose {
+  font-size: clamp(1.55rem, 5.6vw, 1.75rem);
+  font-weight: 700;
+  letter-spacing: -0.04em;
   color: var(--ink);
-  line-height: 1.55;
-  text-wrap: pretty;
 }
-#worship-view.theme-a .verse-num {
-  font-family: 'JetBrains Mono', ui-monospace, monospace;
-  font-size: 0.7em;
-  color: var(--muted);
-  vertical-align: 0.2em;
+#worship-view.theme-a .scripture-prose,
+#worship-view.theme-a .verses {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 0;
+  text-indent: 0;
+}
+#worship-view.theme-a .scripture-prose .verse-num,
+#worship-view.theme-a .verses .verse-num {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  width: 20px;
+  flex-shrink: 0;
+  color: var(--accent);
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+  vertical-align: baseline;
+  margin-right: 0;
+  padding-top: 4px;
+}
+#worship-view.theme-a .verse-row {
+  display: flex;
+  gap: 14px;
+  align-items: baseline;
+}
+#worship-view.theme-a .verse-text {
+  font-size: 1.125em;
+  line-height: 1.5;
+  color: var(--ink);
   font-weight: 400;
-  margin-right: 4px;
+  letter-spacing: -0.005em;
 }
 
 /* ============================================================
@@ -436,29 +516,31 @@ button { -webkit-tap-highlight-color: transparent; }
   letter-spacing: -0.005em;
 }
 
-/* A (Modern): rounded card */
+/* A (Modern): rounded card, no tab/labels per the design feedback */
 #worship-view.theme-a .note-card {
   background: var(--surface);
-  border-radius: 14px;
-  padding: 20px 18px;
-  border: 1px solid var(--rule);
+  border: 1px solid var(--rule-soft);
+  border-radius: 12px;
+  padding: 22px 22px 24px;
 }
-#worship-view.theme-a .note-eyebrow {
-  font-family: 'JetBrains Mono', ui-monospace, monospace;
-  font-size: 10px;
-  letter-spacing: 0.02em;
-  color: var(--muted);
-  margin-bottom: 10px;
-}
+#worship-view.theme-a .note-eyebrow { display: none; }
 #worship-view.theme-a .note-title {
-  font-size: clamp(1.05rem, 4vw, 1.15rem);
-  letter-spacing: -0.02em;
+  font-size: 1.25em;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  margin: 0 0 14px;
 }
 #worship-view.theme-a .note-card p {
-  color: var(--dim);
-  font-size: 14.5px;
-  line-height: 1.5;
+  font-size: 1em;
+  font-weight: 400;
+  line-height: 1.55;
+  letter-spacing: -0.005em;
+  color: var(--ink-70);
+  margin: 0 0 14px;
 }
+#worship-view.theme-a .note-card p:last-child { margin-bottom: 0; }
+#worship-view.theme-a .note-card strong { font-weight: 600; color: var(--ink); }
 #worship-view.theme-b .note-eyebrow { display: none; }
 
 /* ============================================================
@@ -769,7 +851,7 @@ textarea { resize: vertical; min-height: 180px; line-height: 1.6; font-family: u
   color: var(--ink);
   min-height: 100vh;
   min-height: 100dvh;
-  font-family: 'Inter Tight', Inter, -apple-system, system-ui, sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, system-ui, sans-serif;
   letter-spacing: -0.005em;
   padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
 }
@@ -783,7 +865,7 @@ textarea { resize: vertical; min-height: 180px; line-height: 1.6; font-family: u
 }
 
 .landing-wordmark {
-  font-family: 'Inter Tight', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-weight: 600;
   font-size: 12px;
   letter-spacing: 0.14em;
@@ -793,7 +875,7 @@ textarea { resize: vertical; min-height: 180px; line-height: 1.6; font-family: u
 }
 
 .landing-nav-link {
-  font-family: 'Inter Tight', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 14px;
   font-weight: 500;
   color: var(--ink);
@@ -815,7 +897,7 @@ textarea { resize: vertical; min-height: 180px; line-height: 1.6; font-family: u
 
 .landing-headline {
   margin: 0 0 18px;
-  font-family: 'Inter Tight', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-weight: 500;
   font-size: clamp(2.2rem, 7vw, 3.5rem);
   letter-spacing: -0.04em;
@@ -949,7 +1031,7 @@ textarea { resize: vertical; min-height: 180px; line-height: 1.6; font-family: u
 }
 
 .step-num {
-  font-family: 'Inter Tight', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-weight: 600;
   font-size: 14px;
   width: 32px;
@@ -965,7 +1047,7 @@ textarea { resize: vertical; min-height: 180px; line-height: 1.6; font-family: u
 
 .step-title {
   margin: 0 0 6px;
-  font-family: 'Inter Tight', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-weight: 600;
   font-size: 1.05rem;
   letter-spacing: -0.02em;
@@ -985,7 +1067,7 @@ textarea { resize: vertical; min-height: 180px; line-height: 1.6; font-family: u
 }
 
 .see-live {
-  font-family: 'Inter Tight', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 1rem;
   font-weight: 500;
   color: var(--ink);
@@ -1002,7 +1084,7 @@ textarea { resize: vertical; min-height: 180px; line-height: 1.6; font-family: u
   padding-top: 32px;
   border-top: 1px solid var(--rule);
   text-align: center;
-  font-family: 'Inter Tight', sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 
 .landing-wordmark-sm {
@@ -1044,7 +1126,7 @@ textarea { resize: vertical; min-height: 180px; line-height: 1.6; font-family: u
   color: #15141a;
   min-height: 100vh;
   min-height: 100dvh;
-  font-family: 'Inter Tight', Inter, -apple-system, system-ui, sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, system-ui, sans-serif;
   letter-spacing: -0.005em;
   display: flex;
 }
@@ -1065,7 +1147,7 @@ textarea { resize: vertical; min-height: 180px; line-height: 1.6; font-family: u
 .kiosk-header { display: flex; flex-direction: column; align-items: center; gap: 6px; }
 
 .kiosk-wordmark {
-  font-family: 'Inter Tight', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-weight: 600;
   font-size: 12px;
   letter-spacing: 0.18em;
@@ -1119,7 +1201,7 @@ textarea { resize: vertical; min-height: 180px; line-height: 1.6; font-family: u
   justify-content: center;
 }
 .kiosk-back {
-  font-family: 'Inter Tight', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 13px;
   color: #85827a;
   text-decoration: none;
