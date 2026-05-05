@@ -17,6 +17,8 @@ const STORAGE_KEYS = {
 
 const SEED_SERVICE = {
   church: 'The Well',
+  style: 'a',
+  footer: 'Soli Deo Gloria',
   blocks: [
     {
       kind: 'song',
@@ -167,9 +169,9 @@ function saveService(service) {
 function getPrefs() {
   try {
     const raw = localStorage.getItem(STORAGE_KEYS.prefs);
-    return raw ? JSON.parse(raw) : { style: 'a', dark: false, size: 1 };
+    return raw ? JSON.parse(raw) : { dark: false, size: 1 };
   } catch {
-    return { style: 'a', dark: false, size: 1 };
+    return { dark: false, size: 1 };
   }
 }
 
@@ -227,16 +229,16 @@ function escAttr(s) { return esc(s).replace(/"/g, '&quot;'); }
 
 /* ---------- public worship view ---------- */
 
-function applyPrefsToView() {
+function applyViewState() {
   const view = document.getElementById('worship-view');
   const prefs = getPrefs();
-  view.classList.toggle('theme-a', prefs.style === 'a');
-  view.classList.toggle('theme-b', prefs.style === 'b');
+  const service = getService();
+  const style = service.style === 'b' ? 'b' : 'a';
+  view.classList.toggle('theme-a', style === 'a');
+  view.classList.toggle('theme-b', style === 'b');
   view.classList.toggle('dark', !!prefs.dark);
   view.dataset.size = String(prefs.size ?? 1);
 
-  const styleInd = view.querySelector('.style-indicator');
-  if (styleInd) styleInd.textContent = prefs.style === 'a' ? 'A' : 'B';
   const darkInd = view.querySelector('.dark-indicator');
   if (darkInd) darkInd.textContent = prefs.dark ? '☼' : '☾';
 }
@@ -291,7 +293,6 @@ function renderScripture(b) {
   return `
     <article class="block block-scripture">
       <div class="scripture-head">
-        <div class="scripture-eyebrow">— Scripture</div>
         <h2 class="scripture-reference">${esc(b.reference || '')}</h2>
       </div>
       <p class="scripture-prose">${verses}</p>
@@ -304,7 +305,6 @@ function renderNote(b) {
   return `
     <article class="block block-note">
       <div class="note-card">
-        <div class="note-eyebrow">— Note</div>
         <h3 class="note-title">${esc(b.title || '')}</h3>
         ${paras}
       </div>
@@ -320,31 +320,27 @@ function renderBlock(b) {
 }
 
 function renderWorship() {
-  applyPrefsToView();
-  const prefs = getPrefs();
+  applyViewState();
   const service = getService();
+  const style = service.style === 'b' ? 'b' : 'a';
 
-  // top bar left
+  // top bar left: church name in B, church name in A (was already)
   const tbLeft = document.getElementById('topbar-left');
-  if (prefs.style === 'b') {
-    tbLeft.textContent = formatDateB().iso;
-  } else {
-    tbLeft.textContent = service.church || '';
-  }
+  tbLeft.textContent = service.church || '';
 
   // header
   const dateEl = document.getElementById('hdr-date');
   const churchEl = document.getElementById('hdr-church');
-  if (prefs.style === 'b') {
+  if (style === 'b') {
     const d = formatDateB();
     dateEl.innerHTML = `<span>${esc(d.weekday)}</span><span>${esc(d.pretty)}</span>`;
-    churchEl.textContent = service.church ? `${service.church} — Order of Service` : '';
+    churchEl.textContent = 'Order of Service';
   } else {
     dateEl.textContent = formatDateA();
-    churchEl.textContent = service.church || '';
+    churchEl.textContent = '';
   }
 
-  // mini-nav (only renders in theme-b via CSS, but always populate so toggling works)
+  // mini-nav (only displays in theme-b via CSS, but always populate so toggling works)
   const nav = document.getElementById('mini-nav');
   nav.innerHTML = (service.blocks || []).map((b, i) =>
     `<button class="mini-pill" data-jump="${i}">${esc(miniLabel(b))}</button>`
@@ -358,12 +354,13 @@ function renderWorship() {
     container.innerHTML = service.blocks.map(renderBlock).join('');
   }
 
-  // footer
+  // footer (custom text used by both styles; rendered with each variant's treatment)
   const footer = document.getElementById('worship-footer');
-  if (prefs.style === 'b') {
-    footer.innerHTML = `<span>END / ORDER</span><span>${(service.blocks || []).length} blocks</span>`;
+  const footerText = (service.footer || '').trim() || 'Soli Deo Gloria';
+  if (style === 'b') {
+    footer.innerHTML = `<span>${esc(footerText)}</span>`;
   } else {
-    footer.innerHTML = `✶ Soli Deo Gloria ✶`;
+    footer.innerHTML = `✶ ${esc(footerText)} ✶`;
   }
 
   setupMiniNavTracking();
@@ -403,26 +400,21 @@ document.addEventListener('click', (e) => {
   }
 
   const action = t.dataset.action;
-  if (action === 'toggle-style') {
-    const p = getPrefs();
-    p.style = p.style === 'a' ? 'b' : 'a';
-    savePrefs(p);
-    renderWorship();
-  } else if (action === 'toggle-dark') {
+  if (action === 'toggle-dark') {
     const p = getPrefs();
     p.dark = !p.dark;
     savePrefs(p);
-    applyPrefsToView();
+    applyViewState();
   } else if (action === 'size-up') {
     const p = getPrefs();
     p.size = Math.min(2, (p.size ?? 1) + 1);
     savePrefs(p);
-    applyPrefsToView();
+    applyViewState();
   } else if (action === 'size-down') {
     const p = getPrefs();
     p.size = Math.max(0, (p.size ?? 1) - 1);
     savePrefs(p);
-    applyPrefsToView();
+    applyViewState();
   }
 });
 
@@ -486,7 +478,7 @@ const ITEM_TYPES = {
   },
 };
 
-let draft = { church: '', blocks: [] };
+let draft = { church: '', style: 'a', footer: '', blocks: [] };
 
 function renderAdmin() {
   const session = getSession();
@@ -494,13 +486,23 @@ function renderAdmin() {
   draft = serviceToDraft(getService());
   if (!draft.blocks.length) draft.blocks.push(emptyDraftItem('song'));
   document.getElementById('church-name').value = draft.church || '';
+  document.getElementById('footer-text').value = draft.footer || '';
+  paintStylePicker();
   paintEditor();
+}
+
+function paintStylePicker() {
+  document.querySelectorAll('#style-picker .style-option').forEach((el) => {
+    el.classList.toggle('selected', el.dataset.style === draft.style);
+  });
 }
 
 /* Convert stored service shape ↔ flat draft (textarea-friendly) */
 function serviceToDraft(service) {
   return {
     church: service.church || '',
+    style: service.style === 'b' ? 'b' : 'a',
+    footer: service.footer || '',
     blocks: (service.blocks || []).map(blockToDraft),
   };
 }
@@ -603,12 +605,20 @@ function paintEditor() {
 document.addEventListener('input', (e) => {
   const t = e.target;
   if (t && t.id === 'church-name') { draft.church = t.value; return; }
+  if (t && t.id === 'footer-text') { draft.footer = t.value; return; }
   if (!t || !t.dataset || !t.dataset.field) return;
   const i = Number(t.dataset.index);
   draft.blocks[i][t.dataset.field] = t.value;
 });
 
 document.addEventListener('click', (e) => {
+  const styleOpt = e.target.closest('.style-option');
+  if (styleOpt && styleOpt.dataset.style) {
+    draft.style = styleOpt.dataset.style;
+    paintStylePicker();
+    return;
+  }
+
   const t = e.target.closest('[data-action]');
   if (!t) return;
   const action = t.dataset.action;
@@ -644,7 +654,12 @@ if (saveBtn) saveBtn.addEventListener('click', () => {
       if (b.kind === 'note') return b.title || b.body.length;
       return false;
     });
-  saveService({ church: (draft.church || '').trim(), blocks });
+  saveService({
+    church: (draft.church || '').trim(),
+    style: draft.style === 'b' ? 'b' : 'a',
+    footer: (draft.footer || '').trim(),
+    blocks,
+  });
   const msg = document.getElementById('save-message');
   msg.textContent = `Saved ${blocks.length} block${blocks.length === 1 ? '' : 's'}.`;
   setTimeout(() => { msg.textContent = ''; }, 2400);
