@@ -324,14 +324,15 @@ function renderWorship() {
   const service = getService();
   const style = service.style === 'b' ? 'b' : 'a';
 
-  // top bar left: church name in B, church name in A (was already)
+  // top bar left: church name in both styles
   const tbLeft = document.getElementById('topbar-left');
   tbLeft.textContent = service.church || '';
 
-  // header
+  // header — A (Modern) shows numeric date + "Order of Service" sub-line;
+  // B (Quiet) shows long-form date and no sub-line (ornate divider takes its place)
   const dateEl = document.getElementById('hdr-date');
   const churchEl = document.getElementById('hdr-church');
-  if (style === 'b') {
+  if (style === 'a') {
     const d = formatDateB();
     dateEl.innerHTML = `<span>${esc(d.weekday)}</span><span>${esc(d.pretty)}</span>`;
     churchEl.textContent = 'Order of Service';
@@ -340,7 +341,7 @@ function renderWorship() {
     churchEl.textContent = '';
   }
 
-  // mini-nav (only displays in theme-b via CSS, but always populate so toggling works)
+  // mini-nav (only displays in style A via CSS, but always populate so toggling works)
   const nav = document.getElementById('mini-nav');
   nav.innerHTML = (service.blocks || []).map((b, i) =>
     `<button class="mini-pill" data-jump="${i}">${esc(miniLabel(b))}</button>`
@@ -357,7 +358,7 @@ function renderWorship() {
   // footer (custom text used by both styles; rendered with each variant's treatment)
   const footer = document.getElementById('worship-footer');
   const footerText = (service.footer || '').trim() || 'Soli Deo Gloria';
-  if (style === 'b') {
+  if (style === 'a') {
     footer.innerHTML = `<span>${esc(footerText)}</span>`;
   } else {
     footer.innerHTML = `✶ ${esc(footerText)} ✶`;
