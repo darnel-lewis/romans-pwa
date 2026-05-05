@@ -1,20 +1,54 @@
 /* Today's Worship — demo
  *
- * This is a self-contained demo. Auth and storage are mocked with localStorage
- * so you can try the full flow (sign in → edit → publish → view) without a
- * backend. Swap the auth/storage helpers for Supabase when ready.
+ * Self-contained demo: auth and storage are mocked with localStorage so the
+ * full flow (sign in → edit → publish → view) works without a backend.
+ * Swap the auth/storage helpers for Supabase when ready.
  */
 
 const STORAGE_KEYS = {
   session: 'worship.session',
-  songs: 'worship.songs',
+  items: 'worship.items.v2',
 };
 
-const SEED_SONGS = [
+const ITEM_TYPES = {
+  song: {
+    label: 'Song',
+    titlePlaceholder: 'Song title',
+    metaLabel: 'Artist (optional)',
+    metaPlaceholder: 'e.g. Hillsong',
+    bodyLabel: 'Lyrics',
+    bodyPlaceholder: 'Paste lyrics here. Separate stanzas with a blank line.',
+  },
+  scripture: {
+    label: 'Scripture',
+    titlePlaceholder: 'e.g. John 3:16–21',
+    metaLabel: 'Translation (optional)',
+    metaPlaceholder: 'e.g. ESV',
+    bodyLabel: 'Verse text',
+    bodyPlaceholder: 'Paste the passage here.',
+  },
+  note: {
+    label: 'Note',
+    titlePlaceholder: 'e.g. Welcome & Announcements',
+    metaLabel: '',
+    metaPlaceholder: '',
+    bodyLabel: 'Body',
+    bodyPlaceholder: 'Anything you want the congregation to read — announcements, prayer focus, communion instructions.',
+  },
+};
+
+const SEED_ITEMS = [
   {
+    type: 'note',
+    title: 'Welcome',
+    meta: '',
+    body: "Welcome to worship this Sunday. Whether you're here for the first time or the hundredth, we're so glad you're with us.",
+  },
+  {
+    type: 'song',
     title: 'Great Is Thy Faithfulness',
-    artist: 'Thomas Chisholm',
-    lyrics:
+    meta: 'Thomas Chisholm',
+    body:
       "Great is Thy faithfulness, O God my Father\n" +
       "There is no shadow of turning with Thee\n" +
       "Thou changest not, Thy compassions, they fail not\n" +
@@ -25,9 +59,17 @@ const SEED_SONGS = [
       "Great is Thy faithfulness, Lord, unto me!",
   },
   {
+    type: 'scripture',
+    title: 'Romans 8:38–39',
+    meta: 'ESV',
+    body:
+      "For I am sure that neither death nor life, nor angels nor rulers, nor things present nor things to come, nor powers, nor height nor depth, nor anything else in all creation, will be able to separate us from the love of God in Christ Jesus our Lord.",
+  },
+  {
+    type: 'song',
     title: 'In Christ Alone',
-    artist: 'Stuart Townend & Keith Getty',
-    lyrics:
+    meta: 'Stuart Townend & Keith Getty',
+    body:
       "In Christ alone my hope is found\n" +
       "He is my light, my strength, my song\n" +
       "This Cornerstone, this solid Ground\n" +
@@ -41,19 +83,19 @@ const SEED_SONGS = [
 
 /* ---------- storage helpers ---------- */
 
-function getSongs() {
+function getItems() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEYS.songs);
-    if (!raw) return SEED_SONGS;
+    const raw = localStorage.getItem(STORAGE_KEYS.items);
+    if (!raw) return SEED_ITEMS;
     const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : SEED_SONGS;
+    return Array.isArray(parsed) ? parsed : SEED_ITEMS;
   } catch {
-    return SEED_SONGS;
+    return SEED_ITEMS;
   }
 }
 
-function saveSongs(songs) {
-  localStorage.setItem(STORAGE_KEYS.songs, JSON.stringify(songs));
+function saveItems(items) {
+  localStorage.setItem(STORAGE_KEYS.items, JSON.stringify(items));
 }
 
 function getSession() {
@@ -105,7 +147,7 @@ function formatToday() {
   });
 }
 
-function renderLyrics(text) {
+function renderBody(text) {
   const stanzas = (text || '').split(/\n\s*\n/);
   return stanzas
     .map((s) => `<div class="stanza">${escapeHtml(s)}</div>`)
@@ -119,25 +161,29 @@ function escapeHtml(s) {
     .replace(/>/g, '&gt;');
 }
 
+function escapeAttr(s) {
+  return escapeHtml(s).replace(/"/g, '&quot;');
+}
+
 function renderWorship() {
   const dateEl = document.getElementById('today-date');
   if (dateEl) dateEl.textContent = formatToday();
 
-  const songs = getSongs();
+  const items = getItems();
   const container = document.getElementById('songs');
 
-  if (!songs.length) {
-    container.innerHTML = `<div class="empty">No songs added yet.</div>`;
+  if (!items.length) {
+    container.innerHTML = `<div class="empty">Nothing has been added yet.</div>`;
     return;
   }
 
-  container.innerHTML = songs
+  container.innerHTML = items
     .map(
-      (song) => `
-        <article class="song">
-          <h2 class="song-title">${escapeHtml(song.title || 'Untitled')}</h2>
-          ${song.artist ? `<div class="song-meta">${escapeHtml(song.artist)}</div>` : ''}
-          <div class="song-lyrics">${renderLyrics(song.lyrics)}</div>
+      (item) => `
+        <article class="item item-${item.type}">
+          <h2 class="item-title">${escapeHtml(item.title || 'Untitled')}</h2>
+          ${item.meta ? `<div class="item-meta">${escapeHtml(item.meta)}</div>` : ''}
+          <div class="item-body">${renderBody(item.body)}</div>
         </article>
       `,
     )
@@ -157,7 +203,6 @@ loginForm.addEventListener('submit', (e) => {
   loginMessage.classList.remove('error');
   loginMessage.textContent = 'Sending magic link…';
 
-  // In production: call supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: ... } })
   setTimeout(() => {
     setSession({ email, signedInAt: Date.now() });
     loginMessage.textContent = 'Demo: magic link auto-confirmed. Redirecting…';
@@ -176,40 +221,50 @@ let draft = [];
 function renderAdmin() {
   const session = getSession();
   document.getElementById('signed-in-as').textContent = session ? session.email : '';
-  draft = JSON.parse(JSON.stringify(getSongs()));
-  if (!draft.length) draft.push(emptySong());
+  draft = JSON.parse(JSON.stringify(getItems()));
+  if (!draft.length) draft.push(emptyItem('song'));
   paintEditor();
 }
 
-function emptySong() {
-  return { title: '', artist: '', lyrics: '' };
+function emptyItem(type) {
+  return { type, title: '', meta: '', body: '' };
 }
 
 function paintEditor() {
   editor().innerHTML = draft
-    .map(
-      (song, i) => `
-        <div class="song-card" data-index="${i}">
-          <div class="song-card-head">
-            <span class="song-card-num">Song ${i + 1}</span>
-            <button type="button" class="remove-btn" data-action="remove" data-index="${i}">Remove</button>
+    .map((item, i) => {
+      const cfg = ITEM_TYPES[item.type] || ITEM_TYPES.song;
+      const last = i === draft.length - 1;
+      const first = i === 0;
+      return `
+        <div class="item-card" data-index="${i}">
+          <div class="item-card-head">
+            <span class="item-card-num">${cfg.label} · ${i + 1}</span>
+            <div class="item-card-actions">
+              <button type="button" class="icon-btn" data-action="up" data-index="${i}" ${first ? 'disabled' : ''} aria-label="Move up">↑</button>
+              <button type="button" class="icon-btn" data-action="down" data-index="${i}" ${last ? 'disabled' : ''} aria-label="Move down">↓</button>
+              <button type="button" class="remove-btn" data-action="remove" data-index="${i}">Remove</button>
+            </div>
           </div>
+
           <label for="title-${i}">Title</label>
-          <input type="text" id="title-${i}" data-field="title" data-index="${i}" value="${escapeAttr(song.title)}" placeholder="Song title">
+          <input type="text" id="title-${i}" data-field="title" data-index="${i}" value="${escapeAttr(item.title)}" placeholder="${escapeAttr(cfg.titlePlaceholder)}">
 
-          <label for="artist-${i}">Artist (optional)</label>
-          <input type="text" id="artist-${i}" data-field="artist" data-index="${i}" value="${escapeAttr(song.artist)}" placeholder="e.g. Hillsong">
+          ${
+            cfg.metaLabel
+              ? `
+                <label for="meta-${i}">${escapeHtml(cfg.metaLabel)}</label>
+                <input type="text" id="meta-${i}" data-field="meta" data-index="${i}" value="${escapeAttr(item.meta)}" placeholder="${escapeAttr(cfg.metaPlaceholder)}">
+              `
+              : ''
+          }
 
-          <label for="lyrics-${i}">Lyrics</label>
-          <textarea id="lyrics-${i}" data-field="lyrics" data-index="${i}" placeholder="Paste lyrics here. Separate stanzas with a blank line.">${escapeHtml(song.lyrics)}</textarea>
+          <label for="body-${i}">${escapeHtml(cfg.bodyLabel)}</label>
+          <textarea id="body-${i}" data-field="body" data-index="${i}" placeholder="${escapeAttr(cfg.bodyPlaceholder)}">${escapeHtml(item.body)}</textarea>
         </div>
-      `,
-    )
+      `;
+    })
     .join('');
-}
-
-function escapeAttr(s) {
-  return escapeHtml(s).replace(/"/g, '&quot;');
 }
 
 document.addEventListener('input', (e) => {
@@ -220,34 +275,43 @@ document.addEventListener('input', (e) => {
 });
 
 document.addEventListener('click', (e) => {
-  const t = e.target;
-  if (t.dataset && t.dataset.action === 'remove') {
-    const i = Number(t.dataset.index);
-    draft.splice(i, 1);
-    if (!draft.length) draft.push(emptySong());
-    paintEditor();
-  }
-});
+  const t = e.target.closest('[data-action]');
+  if (!t) return;
+  const i = Number(t.dataset.index);
+  const action = t.dataset.action;
 
-document.getElementById('add-song-btn').addEventListener('click', () => {
-  draft.push(emptySong());
-  paintEditor();
-  const last = editor().querySelector('.song-card:last-child input');
-  if (last) last.focus();
+  if (action === 'remove') {
+    draft.splice(i, 1);
+    if (!draft.length) draft.push(emptyItem('song'));
+    paintEditor();
+  } else if (action === 'up' && i > 0) {
+    [draft[i - 1], draft[i]] = [draft[i], draft[i - 1]];
+    paintEditor();
+  } else if (action === 'down' && i < draft.length - 1) {
+    [draft[i + 1], draft[i]] = [draft[i], draft[i + 1]];
+    paintEditor();
+  } else if (action === 'add') {
+    const type = t.dataset.type || 'song';
+    draft.push(emptyItem(type));
+    paintEditor();
+    const last = editor().querySelector('.item-card:last-child input');
+    if (last) last.focus();
+  }
 });
 
 document.getElementById('save-btn').addEventListener('click', () => {
   const cleaned = draft
     .map((s) => ({
+      type: s.type || 'song',
       title: (s.title || '').trim(),
-      artist: (s.artist || '').trim(),
-      lyrics: (s.lyrics || '').trim(),
+      meta: (s.meta || '').trim(),
+      body: (s.body || '').trim(),
     }))
-    .filter((s) => s.title || s.lyrics);
+    .filter((s) => s.title || s.body);
 
-  saveSongs(cleaned);
+  saveItems(cleaned);
   const msg = document.getElementById('save-message');
-  msg.textContent = `Saved ${cleaned.length} song${cleaned.length === 1 ? '' : 's'}.`;
+  msg.textContent = `Saved ${cleaned.length} item${cleaned.length === 1 ? '' : 's'}.`;
   setTimeout(() => {
     msg.textContent = '';
   }, 2400);

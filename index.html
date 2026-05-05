@@ -64,7 +64,13 @@
 
     <div class="admin-body">
       <div id="song-editor"></div>
-      <button class="btn btn-secondary" id="add-song-btn">+ Add another song</button>
+
+      <div class="add-row">
+        <span class="add-label">Add</span>
+        <button class="btn btn-secondary" data-action="add" data-type="song">+ Song</button>
+        <button class="btn btn-secondary" data-action="add" data-type="scripture">+ Scripture</button>
+        <button class="btn btn-secondary" data-action="add" data-type="note">+ Note</button>
+      </div>
 
       <div class="save-bar">
         <a href="#" class="btn btn-ghost">Preview</a>
