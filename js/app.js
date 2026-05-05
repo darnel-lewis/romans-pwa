@@ -11,7 +11,12 @@
 
 const STORAGE_KEYS = {
   session: 'worship.session',
-  service: 'worship.service.v3',
+  // Legacy single-service key — read once for migration, then ignored.
+  serviceLegacy: 'worship.service.v3',
+  // New model: account-wide settings + an array of dated services.
+  account: 'worship.account.v1',
+  services: 'worship.services.v1',
+  editingId: 'worship.editing-service-id',
   prefs: 'worship.prefs.v1',
   songLibrary: 'worship.song-library.v1',
 };
@@ -135,20 +140,176 @@ const SEED_SERVICE = {
 
 /* ---------- storage helpers ---------- */
 
-function getService() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEYS.service);
-    if (!raw) return clone(SEED_SERVICE);
-    const parsed = JSON.parse(raw);
-    if (!parsed || !Array.isArray(parsed.blocks)) return clone(SEED_SERVICE);
-    return parsed;
-  } catch {
-    return clone(SEED_SERVICE);
-  }
+/* ---------- account + services storage ----------
+ *
+ * Account holds everything that's the same across all services for a
+ * church (name, visual style, footer text). Services is an array of
+ * dated service rows {id, date, subtitle, blocks}.
+ *
+ * On the public page we auto-pick the "live" service by date.
+ * In admin we edit a specific service id (which falls back to the live
+ * one when none is explicitly selected).
+ *
+ * Migration: if the legacy single-service key exists from before the
+ * split, we read it once on first access to seed both account and the
+ * services array.
+ */
+
+function makeId() {
+  return Math.random().toString(36).slice(2, 10);
 }
 
-function saveService(service) {
-  localStorage.setItem(STORAGE_KEYS.service, JSON.stringify(service));
+function todayISO() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+function addDays(dateStr, days) {
+  const m = (dateStr || '').match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!m) return nextSundayISO();
+  const d = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+  d.setDate(d.getDate() + days);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+function daysBetween(a, b) {
+  const ma = (a || '').match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  const mb = (b || '').match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!ma || !mb) return 0;
+  const da = new Date(Number(ma[1]), Number(ma[2]) - 1, Number(ma[3]));
+  const db = new Date(Number(mb[1]), Number(mb[2]) - 1, Number(mb[3]));
+  return Math.round((da - db) / 86400000);
+}
+
+function loadLegacyService() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEYS.serviceLegacy);
+    if (!raw) return null;
+    const s = JSON.parse(raw);
+    if (!s || !Array.isArray(s.blocks)) return null;
+    return s;
+  } catch { return null; }
+}
+
+function getAccount() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEYS.account);
+    if (raw) {
+      const a = JSON.parse(raw);
+      if (a && typeof a === 'object') return a;
+    }
+  } catch {}
+  // Migrate from legacy or seed.
+  const legacy = loadLegacyService();
+  if (legacy) {
+    return {
+      church: legacy.church || 'The Well',
+      style: legacy.style === 'b' ? 'b' : 'a',
+      footer: legacy.footer || 'Soli Deo Gloria',
+    };
+  }
+  return {
+    church: SEED_SERVICE.church,
+    style: SEED_SERVICE.style,
+    footer: SEED_SERVICE.footer,
+  };
+}
+
+function saveAccount(account) {
+  localStorage.setItem(STORAGE_KEYS.account, JSON.stringify(account));
+}
+
+function getServices() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEYS.services);
+    if (raw) {
+      const arr = JSON.parse(raw);
+      if (Array.isArray(arr)) return arr;
+    }
+  } catch {}
+  // Migrate from legacy or seed.
+  const legacy = loadLegacyService();
+  if (legacy) {
+    return [{
+      id: makeId(),
+      date: legacy.date || nextSundayISO(),
+      subtitle: legacy.subtitle || '',
+      blocks: legacy.blocks || [],
+    }];
+  }
+  return [{
+    id: makeId(),
+    date: nextSundayISO(),
+    subtitle: '',
+    blocks: clone(SEED_SERVICE.blocks),
+  }];
+}
+
+function saveServices(services) {
+  localStorage.setItem(STORAGE_KEYS.services, JSON.stringify(services));
+}
+
+function getEditingId() {
+  return localStorage.getItem(STORAGE_KEYS.editingId) || null;
+}
+
+function setEditingId(id) {
+  if (id) localStorage.setItem(STORAGE_KEYS.editingId, id);
+  else localStorage.removeItem(STORAGE_KEYS.editingId);
+}
+
+/* "Live" service: the one whose date is closest to today. Ties favor
+ * future services so by midweek the page rolls forward to next Sunday. */
+function getLiveService(services) {
+  const list = services || getServices();
+  if (!list.length) return null;
+  const today = todayISO();
+  let best = list[0];
+  let bestDiff = Math.abs(daysBetween(best.date, today));
+  let bestFuture = daysBetween(best.date, today) >= 0;
+  for (let i = 1; i < list.length; i++) {
+    const s = list[i];
+    const d = daysBetween(s.date, today);
+    const abs = Math.abs(d);
+    const future = d >= 0;
+    if (abs < bestDiff || (abs === bestDiff && future && !bestFuture)) {
+      best = s;
+      bestDiff = abs;
+      bestFuture = future;
+    }
+  }
+  return best;
+}
+
+/* For public-page consumers: returns a single object with account
+ * settings merged onto the live service so the existing render code
+ * keeps working unchanged. */
+function getService() {
+  const account = getAccount();
+  const live = getLiveService();
+  if (!live) return { ...account, date: '', subtitle: '', blocks: [] };
+  return {
+    ...account,
+    id: live.id,
+    date: live.date,
+    subtitle: live.subtitle,
+    blocks: live.blocks,
+  };
+}
+
+/* For admin: returns the service currently being edited (with account
+ * merged in). Falls back to the live service. */
+function getActiveService() {
+  const account = getAccount();
+  const services = getServices();
+  let id = getEditingId();
+  let s = id ? services.find((x) => x.id === id) : null;
+  if (!s) {
+    s = getLiveService(services);
+    if (s) setEditingId(s.id);
+  }
+  if (!s) return { ...account, id: null, date: '', subtitle: '', blocks: [] };
+  return { ...account, id: s.id, date: s.date, subtitle: s.subtitle, blocks: s.blocks };
 }
 
 function getPrefs() {
@@ -775,22 +936,49 @@ let draft = { church: '', style: 'a', footer: '', blocks: [] };
 function renderAdmin() {
   const session = getSession();
   document.getElementById('signed-in-as').textContent = session ? session.email : '';
-  draft = serviceToDraft(getService());
+  draft = serviceToDraft(getActiveService());
   if (!draft.blocks.length) draft.blocks.push(emptyDraftItem('song'));
   if (!draft.date) draft.date = nextSundayISO();
+  if (!draft.id) draft.id = makeId();
   document.getElementById('church-name').value = draft.church || '';
   document.getElementById('service-date-input').value = draft.date || '';
   document.getElementById('subtitle-text').value = draft.subtitle || '';
   document.getElementById('footer-text').value = draft.footer || '';
-  // Auto-open the custom-label section if there's already a custom subtitle
   const labelSection = document.getElementById('custom-label-section');
   if (labelSection) labelSection.open = !!(draft.subtitle && draft.subtitle.trim());
   paintStylePicker();
   paintEditor();
+  paintServicePicker();
   updateAdminTitle();
   updateDatePreview();
-  // Share QR is generated lazily when the Share modal opens (togglePanel),
-  // not on every admin load — keeps it out of the DOM until needed.
+}
+
+/* Renders the horizontal service-picker bar. One pill per saved service
+ * (sorted by date), a live-dot on whichever service is currently
+ * rendering publicly, and a "+ New service" button at the end. */
+function paintServicePicker() {
+  const el = document.getElementById('service-picker');
+  if (!el) return;
+  const services = [...getServices()].sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+  const live = getLiveService(services);
+  const liveId = live ? live.id : null;
+  const html = services.map((s) => {
+    const formatted = formatServiceDate(s.date);
+    const label = formatted ? formatted.split(' · ')[1] || formatted : 'No date';
+    const isActive = s.id === draft.id;
+    const isLive = s.id === liveId;
+    return `
+      <button type="button" class="service-pill ${isActive ? 'is-active' : ''} ${isLive ? 'is-live' : ''}"
+        data-action="switch-service" data-service-id="${escAttr(s.id)}"
+        title="${isLive ? 'Currently live on the public page' : ''}">
+        ${isLive ? '<span class="service-live-dot" aria-label="Live"></span>' : ''}
+        <span class="service-pill-label">${esc(label)}</span>
+      </button>
+    `;
+  }).join('');
+  el.innerHTML = html + `
+    <button type="button" class="service-pill is-new" data-action="new-service">+ New service</button>
+  `;
 }
 
 function updateAdminTitle() {
@@ -816,6 +1004,7 @@ function paintStylePicker() {
 /* Convert stored service shape ↔ flat draft (textarea-friendly) */
 function serviceToDraft(service) {
   return {
+    id: service.id || null,
     church: service.church || '',
     style: service.style === 'b' ? 'b' : 'a',
     date: service.date || '',
@@ -1089,6 +1278,12 @@ document.addEventListener('click', (e) => {
   } else if (action === 'expand-all') {
     collapsedIds.clear();
     paintEditor();
+  } else if (action === 'switch-service') {
+    switchService(t.dataset.serviceId);
+  } else if (action === 'new-service') {
+    newService();
+  } else if (action === 'delete-service') {
+    deleteCurrentService();
   } else if (action === 'invite-member') {
     inviteMemberStub();
   } else if (action === 'open-bulk-paste') {
@@ -1259,6 +1454,50 @@ function bulkPasteApply(mode) {
   closeModals();
 }
 
+/* ---------- service switching / creating / deleting ---------- */
+
+function switchService(id) {
+  if (!id || id === draft.id) return;
+  performSave({ silent: true });
+  setEditingId(id);
+  renderAdmin();
+}
+
+function newService() {
+  performSave({ silent: true });
+  // Default new-service date: 7 days after the latest existing service.
+  const services = getServices();
+  let latest = '';
+  services.forEach((s) => { if ((s.date || '') > latest) latest = s.date; });
+  const newDate = latest ? addDays(latest, 7) : nextSundayISO();
+  const fresh = {
+    id: makeId(),
+    date: newDate,
+    subtitle: '',
+    blocks: [],
+  };
+  services.push(fresh);
+  saveServices(services);
+  setEditingId(fresh.id);
+  renderAdmin();
+}
+
+function deleteCurrentService() {
+  const services = getServices();
+  if (services.length <= 1) {
+    alert("Can't delete your only service. Create another one first if you want a fresh start.");
+    return;
+  }
+  const formatted = formatServiceDate(draft.date) || draft.date || 'this service';
+  if (!confirm(`Delete the service for ${formatted}? This can't be undone.`)) return;
+  const remaining = services.filter((s) => s.id !== draft.id);
+  saveServices(remaining);
+  // Switch to the live service from the remaining list.
+  const next = getLiveService(remaining);
+  setEditingId(next ? next.id : null);
+  renderAdmin();
+}
+
 function inviteMemberStub() {
   const input = document.getElementById('invite-email');
   const email = (input && input.value || '').trim();
@@ -1289,15 +1528,28 @@ function performSave({ silent = false } = {}) {
       if (b.kind === 'note') return b.title || b.body.length;
       return false;
     });
-  saveService({
+  // Account-wide settings
+  saveAccount({
     church: (draft.church || '').trim(),
     style: draft.style === 'b' ? 'b' : 'a',
+    footer: (draft.footer || '').trim(),
+  });
+  // Upsert this service into the services array by id
+  const services = getServices();
+  const newService = {
+    id: draft.id || makeId(),
     date: (draft.date || '').trim(),
     subtitle: (draft.subtitle || '').trim(),
-    footer: (draft.footer || '').trim(),
     blocks,
-  });
+  };
+  draft.id = newService.id;
+  const idx = services.findIndex((s) => s.id === newService.id);
+  if (idx >= 0) services[idx] = newService;
+  else services.push(newService);
+  saveServices(services);
+  setEditingId(newService.id);
   libraryUpsert(blocks.filter((b) => b.kind === 'song'));
+  paintServicePicker();
   const t = new Date().toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
   setSaveStatus('saved', `Saved at ${t}`);
   if (!silent) {
