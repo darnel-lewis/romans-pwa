@@ -309,12 +309,14 @@ function renderWorship() {
   const service = getService();
   const style = service.style === 'b' ? 'b' : 'a';
 
-  // top bar left: church name in both styles
+  // Top bar = product wordmark; H1 = church name (the headline).
   const tbLeft = document.getElementById('topbar-left');
-  tbLeft.textContent = service.church || '';
+  tbLeft.textContent = "Today’s Worship";
 
-  // header — A (Modern) shows numeric date + "Order of Service" sub-line;
-  // B (Quiet) shows long-form date and no sub-line (ornate divider takes its place)
+  const titleEl = document.getElementById('worship-title');
+  titleEl.textContent = service.church || '';
+
+  // header
   const dateEl = document.getElementById('hdr-date');
   const churchEl = document.getElementById('hdr-church');
   if (style === 'a') {
