@@ -194,6 +194,11 @@ function route() {
     }
     return;
   }
+  if (hash === 'about') {
+    document.getElementById('landing-view').classList.add('active');
+    window.scrollTo(0, 0);
+    return;
+  }
   document.getElementById('worship-view').classList.add('active');
   renderWorship();
 }
