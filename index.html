@@ -54,9 +54,79 @@
     <footer class="worship-footer" id="worship-footer"></footer>
 
     <div class="admin-bottom">
+      <a href="#about" class="admin-link">About</a>
+      <span class="admin-link-sep">·</span>
       <a href="#admin" class="admin-link">Admin</a>
     </div>
   </main>
+
+  <!-- Landing / About view -->
+  <section id="landing-view" class="view">
+    <div class="landing-topbar">
+      <a href="#" class="landing-wordmark">Today&rsquo;s Worship</a>
+      <a href="#admin" class="landing-nav-link">Sign in</a>
+    </div>
+
+    <main class="landing-main">
+      <section class="landing-hero">
+        <h1 class="landing-headline">Worship outside the sanctuary.</h1>
+        <p class="landing-sub">
+          Lyrics, scripture, and notes on every phone &mdash; built for churches on mission,
+          in homes, restaurants, and anywhere a projector won&rsquo;t go.
+          Free to use; supported by gifts.
+        </p>
+        <div class="landing-cta">
+          <a href="#admin" class="btn btn-primary">Get started</a>
+          <a href="#" class="btn btn-ghost">See a demo &rarr;</a>
+        </div>
+      </section>
+
+      <section class="landing-preview" aria-label="Live preview">
+        <div class="phone-frame">
+          <div class="phone-notch" aria-hidden="true"></div>
+          <iframe
+            class="phone-screen"
+            src="/"
+            title="Live preview of a worship page"
+            loading="lazy"
+          ></iframe>
+        </div>
+        <div class="landing-preview-caption">A real, live page &mdash; scroll it.</div>
+      </section>
+
+      <section class="landing-steps">
+        <div class="landing-section-eyebrow">How it works</div>
+        <ol class="steps">
+          <li class="step">
+            <div class="step-num">1</div>
+            <div class="step-body">
+              <h3 class="step-title">Paste your set</h3>
+              <p class="step-text">Songs with lyrics, scripture, and any notes for the gathering.</p>
+            </div>
+          </li>
+          <li class="step">
+            <div class="step-num">2</div>
+            <div class="step-body">
+              <h3 class="step-title">Share the link</h3>
+              <p class="step-text">Send the URL or print a QR code &mdash; you get a permanent address like todaysworship.com/yourchurch.</p>
+            </div>
+          </li>
+          <li class="step">
+            <div class="step-num">3</div>
+            <div class="step-body">
+              <h3 class="step-title">Worship together</h3>
+              <p class="step-text">Everyone follows along on their phone. No projector required.</p>
+            </div>
+          </li>
+        </ol>
+      </section>
+
+      <footer class="landing-footer">
+        <div class="landing-wordmark-sm">Today&rsquo;s Worship</div>
+        <div class="landing-footer-text">A free, donation-supported tool. <a href="#">Support this project</a>.</div>
+      </footer>
+    </main>
+  </section>
 
   <!-- Login (magic link) view -->
   <section id="login-view" class="view">
