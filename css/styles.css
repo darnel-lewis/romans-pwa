@@ -116,10 +116,12 @@ button { -webkit-tap-highlight-color: transparent; }
 }
 
 #worship-view.theme-a .topbar-left {
-  font-family: 'JetBrains Mono', ui-monospace, monospace;
-  letter-spacing: 0.04em;
-  text-transform: none;
-  font-size: 10px;
+  font-family: 'Inter Tight', Inter, -apple-system, system-ui, sans-serif;
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink);
 }
 
 .topbar-right { display: flex; align-items: center; gap: 4px; }
