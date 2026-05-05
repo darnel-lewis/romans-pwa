@@ -1,11 +1,11 @@
 {
-  "name": "Romans — Branch Together",
-  "short_name": "Romans",
-  "description": "A 16-day reading plan through the Book of Romans with Branch Together video teaching.",
+  "name": "Today's Worship",
+  "short_name": "Worship",
+  "description": "Lyrics for today's worship service.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#faf8f5",
-  "theme_color": "#2a2520",
+  "background_color": "#faf7f2",
+  "theme_color": "#1a1a1a",
   "orientation": "portrait-primary",
   "icons": [
     {
