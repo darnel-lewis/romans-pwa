@@ -498,6 +498,21 @@ button { -webkit-tap-highlight-color: transparent; }
   font-size: 0.95rem;
 }
 
+.admin-bottom {
+  text-align: center;
+  padding: 0 22px 32px;
+}
+.admin-link {
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-decoration: none;
+  opacity: 0.7;
+}
+.admin-link:hover { opacity: 1; color: var(--ink); }
+
 /* ============================================================
    LOGIN VIEW
    ============================================================ */
