@@ -250,11 +250,17 @@ button { -webkit-tap-highlight-color: transparent; }
   overflow-y: hidden;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
-  scroll-snap-type: x proximity;
   scroll-padding-inline-start: 22px;
+  scroll-padding-inline-end: 22px;
+}
+/* Belt-and-suspenders: ensure the first/last pill respect the inset even
+   if the browser drops padding on the scrollable side. */
+#worship-view.theme-a .mini-pill:first-child { margin-inline-start: 0; }
+#worship-view.theme-a .mini-nav::after {
+  content: '';
+  flex: 0 0 1px;
 }
 #worship-view.theme-a .mini-nav::-webkit-scrollbar { display: none; }
-#worship-view.theme-a .mini-pill { scroll-snap-align: start; }
 
 .mini-pill {
   flex: 0 0 auto;
