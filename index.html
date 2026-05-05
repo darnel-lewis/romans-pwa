@@ -172,19 +172,18 @@
   <!-- Admin / editor view -->
   <section id="admin-view" class="view">
     <header class="admin-header">
-      <h2 id="admin-page-title">Service builder</h2>
-      <div class="admin-actions">
-        <span class="signed-in" id="signed-in-as"></span>
-        <div class="admin-menu-wrap">
-          <button type="button" class="admin-tool admin-menu-toggle" data-action="toggle-admin-menu" aria-label="More" aria-haspopup="true" aria-expanded="false">
-            <span aria-hidden="true">☰</span>
-          </button>
-          <div class="admin-menu" id="admin-menu" hidden>
-            <button type="button" class="admin-menu-item" data-action="toggle-panel" data-panel="settings">Settings</button>
-            <button type="button" class="admin-menu-item" data-action="toggle-panel" data-panel="library">Library</button>
-          </div>
+      <h2 id="admin-page-title">Edit services</h2>
+      <div class="admin-menu-wrap">
+        <button type="button" class="admin-tool admin-menu-toggle" data-action="toggle-admin-menu" aria-label="Menu" aria-haspopup="true" aria-expanded="false">
+          <span aria-hidden="true">☰</span>
+        </button>
+        <div class="admin-menu" id="admin-menu" hidden>
+          <div class="admin-menu-email" id="signed-in-as"></div>
+          <button type="button" class="admin-menu-item" data-action="toggle-panel" data-panel="settings">Settings</button>
+          <button type="button" class="admin-menu-item" data-action="toggle-panel" data-panel="library">Library</button>
+          <div class="admin-menu-divider"></div>
+          <button type="button" class="admin-menu-item" id="logout-btn">Sign out</button>
         </div>
-        <button class="btn btn-ghost" id="logout-btn">Sign out</button>
       </div>
     </header>
 
