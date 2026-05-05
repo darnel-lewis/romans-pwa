@@ -1,136 +1,491 @@
-:root {
-  --bg: #faf7f2;
-  --surface: #ffffff;
-  --ink: #1a1a1a;
-  --ink-soft: #4a4a4a;
-  --ink-mute: #8a8a8a;
-  --line: #e8e2d6;
-  --accent: #6b4f2a;
-  --accent-soft: #f1ead9;
-  --danger: #b00020;
-  --radius: 14px;
-  --shadow: 0 1px 2px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.04);
-}
+/* Today's Worship — public view supports two styles (A & B) plus light/dark.
+ * Theme tokens live on #worship-view; .theme-a / .theme-b switch the look,
+ * .dark switches the palette, and [data-size] scales typography. */
 
 * { box-sizing: border-box; }
 
 html, body {
   margin: 0;
   padding: 0;
-  background: var(--bg);
-  color: var(--ink);
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
 }
 
 body {
   min-height: 100vh;
   min-height: 100dvh;
-  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  background: #faf7f2;
+  color: #1a1a1a;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 .view { display: none; }
 .view.active { display: block; }
 
-/* ========================== WORSHIP (PUBLIC) ========================== */
+button { -webkit-tap-highlight-color: transparent; }
+
+/* ============================================================
+   PUBLIC WORSHIP VIEW — themed via .theme-a / .theme-b + .dark
+   ============================================================ */
 
 #worship-view {
-  max-width: 640px;
-  margin: 0 auto;
-  padding: 2.5rem 1.25rem 4rem;
+  --bg: #f5efe2;
+  --surface: #ede5d2;
+  --ink: #2a2520;
+  --muted: #8a7e6a;
+  --rule: rgba(42,37,32,0.14);
+  --accent: #8a6a3a;
+
+  background: var(--bg);
+  color: var(--ink);
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+  transition: background .25s, color .25s;
 }
 
-.worship-header {
-  text-align: center;
-  padding: 1.5rem 0 2.5rem;
-  border-bottom: 1px solid var(--line);
-  margin-bottom: 2.5rem;
+/* ---- THEME A (Quiet & Contemplative) ---- */
+#worship-view.theme-a {
+  --bg: #f5efe2;
+  --surface: #ede5d2;
+  --ink: #2a2520;
+  --muted: #8a7e6a;
+  --rule: rgba(42,37,32,0.14);
+  --accent: #8a6a3a;
+  font-family: 'Cormorant Garamond', 'EB Garamond', Georgia, serif;
+}
+#worship-view.theme-a.dark {
+  --bg: #1a1816;
+  --surface: #221f1c;
+  --ink: #ece6da;
+  --muted: #8a8278;
+  --rule: rgba(236,230,218,0.14);
+  --accent: #c9a96a;
 }
 
-.eyebrow {
-  font-size: 0.78rem;
-  letter-spacing: 0.18em;
+/* ---- THEME B (Modern Minimal) ---- */
+#worship-view.theme-b {
+  --bg: #f7f5f0;
+  --surface: #ffffff;
+  --ink: #15141a;
+  --muted: #85827a;
+  --rule: rgba(21,20,26,0.10);
+  --accent: #15141a;
+  --dim: rgba(21,20,26,0.55);
+  font-family: 'Inter Tight', Inter, -apple-system, system-ui, sans-serif;
+  letter-spacing: -0.005em;
+}
+#worship-view.theme-b.dark {
+  --bg: #0e0e10;
+  --surface: #16161a;
+  --ink: #f3f1ec;
+  --muted: #7a7a82;
+  --rule: rgba(243,241,236,0.10);
+  --accent: #f3f1ec;
+  --dim: rgba(243,241,236,0.5);
+}
+
+/* Type sizes via data-size: 0=S 1=M 2=L. Each variant has its own base. */
+#worship-view.theme-a { font-size: 17px; line-height: 1.55; }
+#worship-view.theme-a[data-size="0"] { font-size: 15.6px; }
+#worship-view.theme-a[data-size="2"] { font-size: 19px; }
+
+#worship-view.theme-b { font-size: 16px; line-height: 1.5; }
+#worship-view.theme-b[data-size="0"] { font-size: 14.7px; }
+#worship-view.theme-b[data-size="2"] { font-size: 17.9px; }
+
+/* ---- Top bar (shared, themed via tokens) ---- */
+.topbar {
+  position: sticky; top: 0; z-index: 20;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--rule);
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px;
+  padding: 10px 18px;
+}
+
+.topbar-left {
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--ink-mute);
-  margin-bottom: 0.75rem;
+  color: var(--muted);
+}
+
+#worship-view.theme-b .topbar-left {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  font-size: 10px;
+}
+
+.topbar-right { display: flex; align-items: center; gap: 4px; }
+
+.tb-btn {
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 6px 8px;
+  height: 30px;
+  min-width: 30px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.tb-btn:hover { color: var(--ink); }
+.tb-btn .sub { font-size: 10px; vertical-align: super; margin-left: 1px; }
+.tb-btn .style-indicator { font-weight: 600; font-size: 11px; letter-spacing: 0.04em; }
+.tb-btn .dark-indicator { font-size: 13px; }
+
+#worship-view.theme-b .tb-btn { color: var(--ink); font-weight: 600; }
+.size-down { font-size: 11px; }
+.size-up { font-size: 14px; }
+
+.tb-sep { width: 1px; align-self: stretch; background: var(--rule); margin: 4px 4px; }
+
+/* ---- Header ---- */
+.worship-header { text-align: center; }
+
+.hdr-date {
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--muted);
 }
 
 .worship-title {
-  font-family: 'Cormorant Garamond', Georgia, serif;
-  font-weight: 600;
-  font-size: clamp(2.25rem, 7vw, 3.25rem);
-  letter-spacing: -0.01em;
   margin: 0;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+.hdr-church {
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* Theme A header */
+#worship-view.theme-a .worship-header {
+  padding: 56px 28px 40px;
+}
+#worship-view.theme-a .hdr-date { margin-bottom: 28px; }
+#worship-view.theme-a .worship-title {
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(2.4rem, 9vw, 2.95rem);
   line-height: 1.05;
 }
-
-.songs { display: flex; flex-direction: column; gap: 3rem; }
-
-.item { padding: 0; }
-
-.item-title {
-  font-family: 'Cormorant Garamond', Georgia, serif;
-  font-weight: 600;
-  font-size: clamp(1.65rem, 5.5vw, 2.15rem);
-  line-height: 1.15;
-  margin: 0 0 0.35rem;
-  color: var(--ink);
+#worship-view.theme-a .hdr-church {
+  margin-top: 28px;
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+}
+#worship-view.theme-a .hdr-church::before,
+#worship-view.theme-a .hdr-church::after {
+  content: '';
+  width: 24px; height: 1px;
+  background: var(--rule);
 }
 
-.item-meta {
-  font-size: 0.78rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--ink-mute);
-  margin-bottom: 1.25rem;
+/* Theme B header */
+#worship-view.theme-b .worship-header {
+  padding: 36px 22px 22px;
+  text-align: left;
+}
+#worship-view.theme-b .hdr-date {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  font-size: 11px;
+  margin-bottom: 18px;
+  display: flex;
+  justify-content: space-between;
+}
+#worship-view.theme-b .worship-title {
+  font-weight: 500;
+  font-size: clamp(2.1rem, 8vw, 2.5rem);
+  letter-spacing: -0.035em;
+  line-height: 1.0;
+}
+#worship-view.theme-b .hdr-church {
+  margin-top: 14px;
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 14px;
+  letter-spacing: -0.005em;
+  text-transform: none;
+  color: var(--dim);
 }
 
-.item-body {
+/* ---- Mini-nav (theme B only) ---- */
+.mini-nav { display: none; }
+#worship-view.theme-b .mini-nav {
+  display: flex;
+  gap: 6px;
+  padding: 0 22px 22px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+#worship-view.theme-b .mini-nav::-webkit-scrollbar { display: none; }
+
+.mini-pill {
+  flex: 0 0 auto;
+  padding: 6px 12px;
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all .15s;
+}
+.mini-pill.active {
+  background: var(--ink);
+  color: var(--bg);
+  border-color: var(--ink);
+}
+
+/* ---- Blocks container ---- */
+.blocks { padding: 0 22px 60px; }
+#worship-view.theme-a .blocks { padding: 0 28px 60px; }
+
+/* ---- Block separators ---- */
+#worship-view.theme-a .block + .block::before {
+  content: '· · ·';
+  display: block;
+  text-align: center;
+  color: var(--muted);
+  font-size: 18px;
+  letter-spacing: 0.6em;
+  margin: 48px 0;
+}
+#worship-view.theme-b .block {
+  padding-top: 28px;
+  padding-bottom: 28px;
+}
+#worship-view.theme-b .block + .block { border-top: 1px solid var(--rule); }
+#worship-view.theme-b .block:first-child { padding-top: 0; }
+
+/* ============================================================
+   SONG BLOCK
+   ============================================================ */
+
+.song-title { margin: 0; }
+.song-attribution {
   font-family: 'Inter', sans-serif;
-  font-size: 1.0625rem;
-  line-height: 1.7;
-  color: var(--ink-soft);
-  white-space: pre-wrap;
-  word-wrap: break-word;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
 }
 
-.item-body .stanza + .stanza { margin-top: 1.25rem; }
-
-/* Subtle treatment per type — same layout, slightly different feel */
-.item-scripture .item-body {
-  font-family: 'Cormorant Garamond', Georgia, serif;
-  font-size: 1.2rem;
+/* Theme A: centered, serif, italic chorus in accent */
+#worship-view.theme-a .song-head { text-align: center; margin-bottom: 28px; }
+#worship-view.theme-a .song-title {
+  font-weight: 500;
+  font-size: clamp(1.55rem, 6vw, 1.85rem);
+  letter-spacing: -0.005em;
+  line-height: 1.15;
+}
+#worship-view.theme-a .song-attribution { margin-top: 8px; }
+#worship-view.theme-a .stanzas { text-align: center; }
+#worship-view.theme-a .stanza { margin-bottom: 22px; }
+#worship-view.theme-a .stanza.chorus {
   font-style: italic;
+  color: var(--accent);
+}
+
+/* Theme B: left-aligned, sans, chorus has accent rule */
+#worship-view.theme-b .song-head { margin-bottom: 22px; }
+#worship-view.theme-b .song-title {
+  font-weight: 500;
+  font-size: clamp(1.4rem, 5.6vw, 1.6rem);
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+  margin-bottom: 4px;
+}
+#worship-view.theme-b .song-attribution {
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 12px;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--muted);
+}
+#worship-view.theme-b .stanzas { color: var(--dim); }
+#worship-view.theme-b .stanza { margin-bottom: 18px; line-height: 1.5; }
+#worship-view.theme-b .stanza.chorus {
+  padding-left: 16px;
+  border-left: 2px solid var(--ink);
+  color: var(--ink);
+  font-weight: 500;
+}
+
+/* ============================================================
+   SCRIPTURE BLOCK
+   ============================================================ */
+
+.scripture-reference { margin: 0; font-weight: 500; }
+.scripture-prose { margin: 0; }
+.verse-num {
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  margin-right: 3px;
+  vertical-align: super;
+}
+
+/* Theme A: centered ref label + accent reference, prose with text indent */
+#worship-view.theme-a .scripture-head {
+  text-align: center;
+  margin-bottom: 22px;
+}
+#worship-view.theme-a .scripture-eyebrow {
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+#worship-view.theme-a .scripture-reference {
+  font-style: italic;
+  font-size: clamp(1.15rem, 4.5vw, 1.3rem);
+  color: var(--accent);
+}
+#worship-view.theme-a .scripture-prose {
+  text-indent: 1.6em;
+  text-align: left;
+}
+#worship-view.theme-a .verse-num {
+  font-size: 0.62em;
+  color: var(--accent);
+}
+
+/* Theme B: mono eyebrow, weight ref, smaller prose */
+#worship-view.theme-b .scripture-eyebrow {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+#worship-view.theme-b .scripture-reference {
+  font-size: clamp(1.15rem, 4.6vw, 1.3rem);
+  letter-spacing: -0.02em;
+  margin-bottom: 18px;
+}
+#worship-view.theme-b .scripture-prose {
   color: var(--ink);
   line-height: 1.55;
+  text-wrap: pretty;
+}
+#worship-view.theme-b .verse-num {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.7em;
+  color: var(--muted);
+  vertical-align: 0.2em;
+  font-weight: 400;
+  margin-right: 4px;
+}
+
+/* ============================================================
+   NOTE BLOCK
+   ============================================================ */
+
+.note-card { padding: 0; }
+.note-title { margin: 0 0 14px; font-weight: 500; }
+.note-card p { margin: 0 0 14px; text-wrap: pretty; }
+.note-card p:last-child { margin-bottom: 0; }
+
+/* Theme A: surface with left accent rule */
+#worship-view.theme-a .note-card {
+  background: var(--surface);
+  border-radius: 4px;
+  padding: 28px 26px;
+  border-left: 2px solid var(--accent);
+}
+#worship-view.theme-a .note-title {
+  font-style: italic;
+  font-size: clamp(1.15rem, 4.5vw, 1.3rem);
+  letter-spacing: -0.005em;
+}
+
+/* Theme B: rounded card with eyebrow */
+#worship-view.theme-b .note-card {
+  background: var(--surface);
+  border-radius: 14px;
+  padding: 20px 18px;
+  border: 1px solid var(--rule);
+}
+#worship-view.theme-b .note-eyebrow {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+#worship-view.theme-b .note-title {
+  font-size: clamp(1.05rem, 4vw, 1.15rem);
+  letter-spacing: -0.02em;
+}
+#worship-view.theme-b .note-card p {
+  color: var(--dim);
+  font-size: 14.5px;
+  line-height: 1.5;
+}
+#worship-view.theme-a .note-eyebrow { display: none; }
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+
+.worship-footer {
+  padding: 0 22px 60px;
+  text-align: center;
+  font-family: 'Inter', sans-serif;
+  color: var(--muted);
+}
+
+#worship-view.theme-a .worship-footer {
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  margin-top: 16px;
+}
+
+#worship-view.theme-b .worship-footer {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 10px;
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid var(--rule);
+  padding-top: 20px;
+  margin: 24px 22px 60px;
 }
 
 .empty {
   text-align: center;
-  color: var(--ink-mute);
+  color: var(--muted);
   padding: 3rem 1rem;
   font-size: 0.95rem;
 }
 
-.worship-footer {
-  margin-top: 4rem;
-  text-align: center;
-}
-
-.admin-link {
-  font-size: 0.78rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--ink-mute);
-  text-decoration: none;
-  border-bottom: 1px solid var(--line);
-  padding-bottom: 2px;
-}
-
-.admin-link:hover { color: var(--accent); }
-
-/* ========================== LOGIN ========================== */
+/* ============================================================
+   LOGIN VIEW
+   ============================================================ */
 
 #login-view {
   min-height: 100vh;
@@ -140,85 +495,59 @@ body {
   justify-content: center;
   padding: 1.25rem;
 }
-
 #login-view.active { display: flex; }
 
 .login-card {
-  background: var(--surface);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 1px 2px rgba(0,0,0,.04), 0 8px 24px rgba(0,0,0,.04);
   padding: 2rem 1.75rem;
   width: 100%;
   max-width: 420px;
 }
-
 .login-card h2 {
   font-family: 'Cormorant Garamond', Georgia, serif;
   font-size: 1.85rem;
-  margin: 0 0 0.5rem;
+  margin: 0 0 .5rem;
   font-weight: 600;
 }
-
-.login-sub {
-  color: var(--ink-mute);
-  margin: 0 0 1.5rem;
-  font-size: 0.95rem;
-}
-
-#login-form { display: flex; flex-direction: column; gap: 0.5rem; }
+.login-sub { color: #8a8a8a; margin: 0 0 1.5rem; font-size: .95rem; }
+#login-form { display: flex; flex-direction: column; gap: .5rem; }
 
 label {
-  font-size: 0.78rem;
-  letter-spacing: 0.08em;
+  font-size: .78rem;
+  letter-spacing: .08em;
   text-transform: uppercase;
-  color: var(--ink-mute);
+  color: #8a8a8a;
   font-weight: 500;
 }
 
 input[type="email"], input[type="text"], textarea {
   font-family: inherit;
   font-size: 1rem;
-  padding: 0.75rem 0.875rem;
-  border: 1px solid var(--line);
+  padding: .75rem .875rem;
+  border: 1px solid #e8e2d6;
   border-radius: 10px;
-  background: var(--surface);
-  color: var(--ink);
+  background: #fff;
+  color: #1a1a1a;
   width: 100%;
   outline: none;
-  transition: border-color 0.15s, box-shadow 0.15s;
+  transition: border-color .15s, box-shadow .15s;
 }
-
 input:focus, textarea:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-soft);
+  border-color: #6b4f2a;
+  box-shadow: 0 0 0 3px #f1ead9;
 }
+textarea { resize: vertical; min-height: 180px; line-height: 1.6; font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: .92rem; }
 
-textarea {
-  resize: vertical;
-  min-height: 180px;
-  line-height: 1.6;
-}
+.login-message { margin-top: 1rem; font-size: .9rem; color: #6b4f2a; min-height: 1.2em; }
+.login-message.error { color: #b00020; }
+.back-link { display: block; margin-top: 1.5rem; font-size: .85rem; color: #8a8a8a; text-decoration: none; }
+.back-link:hover { color: #1a1a1a; }
 
-.login-message {
-  margin-top: 1rem;
-  font-size: 0.9rem;
-  color: var(--accent);
-  min-height: 1.2em;
-}
-
-.login-message.error { color: var(--danger); }
-
-.back-link {
-  display: block;
-  margin-top: 1.5rem;
-  font-size: 0.85rem;
-  color: var(--ink-mute);
-  text-decoration: none;
-}
-
-.back-link:hover { color: var(--ink); }
-
-/* ========================== ADMIN ========================== */
+/* ============================================================
+   ADMIN VIEW
+   ============================================================ */
 
 #admin-view {
   max-width: 720px;
@@ -233,132 +562,114 @@ textarea {
   gap: 1rem;
   flex-wrap: wrap;
   padding-bottom: 1rem;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid #e8e2d6;
   margin-bottom: 1.5rem;
 }
-
 .admin-header h2 {
   font-family: 'Cormorant Garamond', Georgia, serif;
   font-size: 1.65rem;
   margin: 0;
   font-weight: 600;
 }
-
-.admin-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.signed-in {
-  font-size: 0.85rem;
-  color: var(--ink-mute);
-}
+.admin-actions { display: flex; align-items: center; gap: .75rem; }
+.signed-in { font-size: .85rem; color: #8a8a8a; }
 
 .admin-body { display: flex; flex-direction: column; gap: 1rem; }
 
 .item-card {
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
+  background: #fff;
+  border: 1px solid #e8e2d6;
+  border-radius: 14px;
   padding: 1rem 1rem 1.25rem;
 }
-
 .item-card-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
+  gap: .5rem;
+  margin-bottom: .5rem;
 }
-
 .item-card-num {
-  font-size: 0.75rem;
-  letter-spacing: 0.12em;
+  font-size: .75rem;
+  letter-spacing: .12em;
   text-transform: uppercase;
-  color: var(--ink-mute);
+  color: #8a8a8a;
 }
-
-.item-card-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-}
+.item-card-actions { display: flex; align-items: center; gap: .25rem; }
 
 .icon-btn {
   background: transparent;
-  border: 1px solid var(--line);
-  color: var(--ink-soft);
-  width: 30px;
-  height: 30px;
+  border: 1px solid #e8e2d6;
+  color: #4a4a4a;
+  width: 30px; height: 30px;
   border-radius: 8px;
   cursor: pointer;
-  font-size: 0.95rem;
+  font-size: .95rem;
   line-height: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
 }
-
-.icon-btn:hover:not(:disabled) { background: var(--surface); color: var(--ink); }
-.icon-btn:disabled { opacity: 0.35; cursor: default; }
+.icon-btn:hover:not(:disabled) { background: #fafafa; color: #1a1a1a; }
+.icon-btn:disabled { opacity: .35; cursor: default; }
 
 .remove-btn {
-  background: none;
-  border: none;
-  color: var(--ink-mute);
-  cursor: pointer;
-  font-size: 0.85rem;
-  padding: 0.25rem 0.5rem;
+  background: none; border: none; color: #8a8a8a;
+  cursor: pointer; font-size: .85rem; padding: .25rem .5rem;
 }
+.remove-btn:hover { color: #b00020; }
 
-.remove-btn:hover { color: var(--danger); }
+.item-card label { margin-top: .5rem; display: block; margin-bottom: .25rem; }
 
-.item-card label { margin-top: 0.5rem; display: block; margin-bottom: 0.25rem; }
+.field-hint {
+  font-size: .75rem;
+  color: #8a8a8a;
+  margin-top: .25rem;
+  font-family: 'Inter', sans-serif;
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 400;
+}
 
 .add-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  align-items: center;
-  padding: 0.5rem 0 0.25rem;
+  display: flex; flex-wrap: wrap; gap: .5rem; align-items: center;
+  padding: .5rem 0 .25rem;
 }
-
 .add-row .add-label {
-  font-size: 0.75rem;
-  letter-spacing: 0.12em;
+  font-size: .75rem;
+  letter-spacing: .12em;
   text-transform: uppercase;
-  color: var(--ink-mute);
-  margin-right: 0.25rem;
+  color: #8a8a8a;
+  margin-right: .25rem;
 }
-
-.add-row .btn { padding: 0.55rem 0.95rem; font-size: 0.9rem; }
+.add-row .btn { padding: .55rem .95rem; font-size: .9rem; }
 
 .save-bar {
   position: sticky;
   bottom: 0;
-  background: linear-gradient(to top, var(--bg) 60%, rgba(250,247,242,0));
-  padding: 1rem 0 0.5rem;
+  background: linear-gradient(to top, #faf7f2 60%, rgba(250,247,242,0));
+  padding: 1rem 0 .5rem;
   display: flex;
-  gap: 0.75rem;
+  gap: .75rem;
   justify-content: flex-end;
-  margin-top: 0.5rem;
+  margin-top: .5rem;
 }
-
 .save-message {
   text-align: right;
-  font-size: 0.85rem;
-  color: var(--accent);
+  font-size: .85rem;
+  color: #6b4f2a;
   min-height: 1.2em;
 }
 
-/* ========================== BUTTONS ========================== */
+/* ============================================================
+   BUTTONS
+   ============================================================ */
 
 .btn {
   font-family: inherit;
-  font-size: 0.95rem;
+  font-size: .95rem;
   font-weight: 500;
-  padding: 0.7rem 1.25rem;
+  padding: .7rem 1.25rem;
   border-radius: 10px;
   border: 1px solid transparent;
   cursor: pointer;
@@ -366,29 +677,14 @@ textarea {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.15s, border-color 0.15s, color 0.15s, transform 0.05s;
+  transition: background .15s, border-color .15s, color .15s, transform .05s;
 }
-
 .btn:active { transform: translateY(1px); }
-
-.btn-primary {
-  background: var(--ink);
-  color: #fff;
-}
+.btn-primary { background: #1a1a1a; color: #fff; }
 .btn-primary:hover { background: #000; }
-
-.btn-secondary {
-  background: var(--accent-soft);
-  color: var(--accent);
-  border-color: var(--accent-soft);
-}
+.btn-secondary { background: #f1ead9; color: #6b4f2a; border-color: #f1ead9; }
 .btn-secondary:hover { background: #e9dfc4; }
+.btn-ghost { background: transparent; color: #4a4a4a; border-color: #e8e2d6; }
+.btn-ghost:hover { background: #fff; }
 
-.btn-ghost {
-  background: transparent;
-  color: var(--ink-soft);
-  border-color: var(--line);
-}
-.btn-ghost:hover { background: var(--surface); }
-
-#login-form .btn-primary { margin-top: 0.75rem; width: 100%; }
+#login-form .btn-primary { margin-top: .75rem; width: 100%; }

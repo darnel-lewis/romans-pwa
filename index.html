@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Today's Worship</title>
-  <meta name="description" content="Lyrics for today's worship service.">
-  <meta name="theme-color" content="#1a1a1a">
+  <meta name="description" content="Lyrics, scripture, and notes for today's worship service.">
+  <meta name="theme-color" content="#f5efe2">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Worship">
@@ -15,26 +15,41 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600&family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
 
   <!-- Public worship view -->
-  <main id="worship-view" class="view active">
+  <main id="worship-view" class="view active theme-a" data-size="1">
+
+    <div class="topbar">
+      <div class="topbar-left" id="topbar-left"><!-- variant-specific date/church --></div>
+      <div class="topbar-right">
+        <button class="tb-btn size-down" data-action="size-down" aria-label="Smaller">A<span class="sub">−</span></button>
+        <button class="tb-btn size-up" data-action="size-up" aria-label="Larger">A<span class="sub">+</span></button>
+        <span class="tb-sep"></span>
+        <button class="tb-btn" data-action="toggle-style" aria-label="Toggle style">
+          <span class="style-indicator">A</span>
+        </button>
+        <button class="tb-btn" data-action="toggle-dark" aria-label="Toggle dark mode">
+          <span class="dark-indicator">☾</span>
+        </button>
+      </div>
+    </div>
+
     <header class="worship-header">
-      <div class="eyebrow" id="today-date"></div>
+      <div class="hdr-date" id="hdr-date"></div>
       <h1 class="worship-title">Today&rsquo;s Worship</h1>
+      <div class="hdr-church" id="hdr-church"></div>
     </header>
 
-    <section id="songs" class="songs">
-      <!-- songs rendered here -->
-    </section>
+    <nav class="mini-nav" id="mini-nav" aria-label="Service order"></nav>
 
-    <footer class="worship-footer">
-      <a href="#admin" class="admin-link">Admin</a>
-    </footer>
+    <section id="blocks" class="blocks"></section>
+
+    <footer class="worship-footer" id="worship-footer"></footer>
   </main>
 
   <!-- Login (magic link) view -->
@@ -63,6 +78,13 @@
     </header>
 
     <div class="admin-body">
+
+      <div class="item-card">
+        <div class="item-card-head"><span class="item-card-num">Service</span></div>
+        <label for="church-name">Church name</label>
+        <input type="text" id="church-name" placeholder="e.g. The Well">
+      </div>
+
       <div id="song-editor"></div>
 
       <div class="add-row">
