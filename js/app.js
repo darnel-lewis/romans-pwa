@@ -17,7 +17,7 @@ const STORAGE_KEYS = {
 
 const SEED_SERVICE = {
   church: 'The Well',
-  style: 'a',
+  style: 'b',
   footer: 'Soli Deo Gloria',
   blocks: [
     {
