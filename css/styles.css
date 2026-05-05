@@ -1293,3 +1293,24 @@ textarea { resize: vertical; min-height: 180px; line-height: 1.6; font-family: u
   flex-wrap: wrap;
 }
 .share-actions .btn { padding: .5rem .85rem; font-size: .85rem; }
+
+/* ============================================================
+   TEXT WRAPPING — avoid single-word orphans on the last line
+   ============================================================
+   Modern browsers' "pretty" algorithm pulls a word back from the
+   last line when it would otherwise sit alone. "balance" keeps
+   short titles wrapping in equal-length chunks. */
+
+.stanza > div,
+.verse-text,
+.scripture-prose,
+.note-card p {
+  text-wrap: pretty;
+}
+
+.worship-title,
+.song-title,
+.scripture-reference,
+.note-title {
+  text-wrap: balance;
+}
