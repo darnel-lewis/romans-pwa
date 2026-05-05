@@ -199,20 +199,14 @@ function getAccount() {
       if (a && typeof a === 'object') return a;
     }
   } catch {}
-  // Migrate from legacy or seed.
+  // Migrate from legacy or seed. Persist so subsequent reads don't keep
+  // re-migrating (and so a freshly generated id stays stable).
   const legacy = loadLegacyService();
-  if (legacy) {
-    return {
-      church: legacy.church || 'The Well',
-      style: legacy.style === 'b' ? 'b' : 'a',
-      footer: legacy.footer || 'Soli Deo Gloria',
-    };
-  }
-  return {
-    church: SEED_SERVICE.church,
-    style: SEED_SERVICE.style,
-    footer: SEED_SERVICE.footer,
-  };
+  const account = legacy
+    ? { church: legacy.church || 'The Well', style: legacy.style === 'b' ? 'b' : 'a', footer: legacy.footer || 'Soli Deo Gloria' }
+    : { church: SEED_SERVICE.church, style: SEED_SERVICE.style, footer: SEED_SERVICE.footer };
+  saveAccount(account);
+  return account;
 }
 
 function saveAccount(account) {
@@ -227,22 +221,25 @@ function getServices() {
       if (Array.isArray(arr)) return arr;
     }
   } catch {}
-  // Migrate from legacy or seed.
+  // Migrate from legacy or seed. Persist immediately so ids stay stable
+  // across calls — without this, every getServices() returned a fresh
+  // id and saves would push duplicates instead of upserting.
   const legacy = loadLegacyService();
-  if (legacy) {
-    return [{
-      id: makeId(),
-      date: legacy.date || nextSundayISO(),
-      subtitle: legacy.subtitle || '',
-      blocks: legacy.blocks || [],
-    }];
-  }
-  return [{
-    id: makeId(),
-    date: nextSundayISO(),
-    subtitle: '',
-    blocks: clone(SEED_SERVICE.blocks),
-  }];
+  const services = legacy
+    ? [{
+        id: makeId(),
+        date: legacy.date || nextSundayISO(),
+        subtitle: legacy.subtitle || '',
+        blocks: legacy.blocks || [],
+      }]
+    : [{
+        id: makeId(),
+        date: nextSundayISO(),
+        subtitle: '',
+        blocks: clone(SEED_SERVICE.blocks),
+      }];
+  saveServices(services);
+  return services;
 }
 
 function saveServices(services) {
@@ -759,18 +756,14 @@ document.addEventListener('change', (e) => {
 /* ---------- admin modals (Settings / Library / Share) ----------
  * Modal overlays — one open at a time. Re-clicking the toggle closes. */
 function togglePanel(name) {
+  closeAdminMenu();
   const target = document.querySelector(`.modal-overlay[data-modal="${name}"]`);
   if (!target) return;
   const wasOpen = !target.hasAttribute('hidden');
   document.querySelectorAll('.modal-overlay').forEach((el) => el.setAttribute('hidden', ''));
-  document.querySelectorAll('.admin-tool[data-action="toggle-panel"]').forEach((b) =>
-    b.classList.remove('is-active')
-  );
   if (!wasOpen) {
     target.removeAttribute('hidden');
     document.body.classList.add('modal-open');
-    const btn = document.querySelector(`.admin-tool[data-panel="${name}"]`);
-    if (btn) btn.classList.add('is-active');
     if (name === 'library') renderLibraryList();
     if (name === 'share') renderAdminShare();
     if (name === 'settings') renderMembersList();
@@ -982,10 +975,9 @@ function paintServicePicker() {
 }
 
 function updateAdminTitle() {
-  const el = document.getElementById('admin-page-title');
-  if (!el) return;
-  const formatted = formatServiceDate(draft.date);
-  el.textContent = formatted || 'Edit service';
+  // H2 is now static ("Service builder"); the date being edited is shown
+  // by the active service-picker pill instead, so this is a no-op now.
+  // Kept as a callsite stub in case we want a date breadcrumb later.
 }
 
 function updateDatePreview() {
@@ -1284,6 +1276,8 @@ document.addEventListener('click', (e) => {
     newService();
   } else if (action === 'delete-service') {
     deleteCurrentService();
+  } else if (action === 'toggle-admin-menu') {
+    toggleAdminMenu();
   } else if (action === 'invite-member') {
     inviteMemberStub();
   } else if (action === 'open-bulk-paste') {
@@ -1453,6 +1447,39 @@ function bulkPasteApply(mode) {
   scheduleAutoSave();
   closeModals();
 }
+
+/* ---------- admin menu (gear button) ---------- */
+
+function toggleAdminMenu() {
+  const menu = document.getElementById('admin-menu');
+  const toggle = document.querySelector('.admin-menu-toggle');
+  if (!menu) return;
+  const isOpen = !menu.hasAttribute('hidden');
+  if (isOpen) {
+    menu.setAttribute('hidden', '');
+    if (toggle) toggle.setAttribute('aria-expanded', 'false');
+  } else {
+    menu.removeAttribute('hidden');
+    if (toggle) toggle.setAttribute('aria-expanded', 'true');
+  }
+}
+
+function closeAdminMenu() {
+  const menu = document.getElementById('admin-menu');
+  const toggle = document.querySelector('.admin-menu-toggle');
+  if (menu && !menu.hasAttribute('hidden')) {
+    menu.setAttribute('hidden', '');
+    if (toggle) toggle.setAttribute('aria-expanded', 'false');
+  }
+}
+
+/* Close the gear menu on click outside or Escape. */
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.admin-menu-wrap')) closeAdminMenu();
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeAdminMenu();
+});
 
 /* ---------- service switching / creating / deleting ---------- */
 

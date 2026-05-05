@@ -1943,3 +1943,50 @@ body.modal-open { overflow: hidden; }
 @media (max-width: 480px) {
   .delete-service-btn { width: 100%; }
 }
+
+/* ============================================================
+   ADMIN — GEAR MENU (Settings + Library hidden behind hamburger)
+   ============================================================ */
+
+.admin-menu-wrap {
+  position: relative;
+}
+
+.admin-menu-toggle {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  font-size: 1.05rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.admin-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 50;
+  background: #fff;
+  border: 1px solid #e8e2d6;
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.10);
+  min-width: 160px;
+  padding: 4px;
+}
+.admin-menu[hidden] { display: none; }
+
+.admin-menu-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: none;
+  font-family: inherit;
+  font-size: .9rem;
+  color: #1a1a1a;
+  padding: .55rem .7rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.admin-menu-item:hover { background: #f7f5f0; }
