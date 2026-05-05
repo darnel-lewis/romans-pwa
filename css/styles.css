@@ -47,11 +47,11 @@ button { -webkit-tap-highlight-color: transparent; }
 
 /* ---- B · Quiet & Contemplative ---- */
 #worship-view.theme-b {
-  --bg: #f5efe2;
-  --surface: #ede5d2;
-  --ink: #2a2520;
+  --bg: #fbf7ed;
+  --surface: #f1ead9;
+  --ink: #1d1812;
   --muted: #8a7e6a;
-  --rule: rgba(42,37,32,0.14);
+  --rule: rgba(29,24,18,0.14);
   --accent: #8a6a3a;
   font-family: 'Cormorant Garamond', 'EB Garamond', Georgia, serif;
 }
