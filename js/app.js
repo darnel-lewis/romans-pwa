@@ -18,6 +18,7 @@ const STORAGE_KEYS = {
 const SEED_SERVICE = {
   church: 'The Well',
   style: 'a',
+  subtitle: 'Order of Service',
   footer: 'Soli Deo Gloria',
   blocks: [
     {
@@ -318,7 +319,7 @@ function renderWorship() {
   const churchEl = document.getElementById('hdr-church');
   if (style === 'a') {
     dateEl.textContent = formatDateB().combined;
-    churchEl.textContent = 'Order of Service';
+    churchEl.textContent = (service.subtitle || '').trim() || 'Order of Service';
   } else {
     dateEl.textContent = formatDateA();
     churchEl.textContent = '';
@@ -355,15 +356,36 @@ function setupMiniNavTracking() {
   const view = document.getElementById('worship-view');
   if (!view.classList.contains('theme-a')) return;
 
+  const nav = document.getElementById('mini-nav');
   const blocks = Array.from(document.querySelectorAll('#blocks .block'));
   const pills = Array.from(document.querySelectorAll('#mini-nav .mini-pill'));
   if (!blocks.length || !pills.length) return;
 
+  let lastActive = -1;
   const update = () => {
     const top = window.scrollY + 140;
     let idx = 0;
     blocks.forEach((el, i) => { if (el.offsetTop <= top) idx = i; });
-    pills.forEach((p, i) => p.classList.toggle('active', i === idx));
+
+    if (idx !== lastActive) {
+      pills.forEach((p, i) => p.classList.toggle('active', i === idx));
+      // Scroll the active pill into view inside the (horizontally scrolling) nav
+      const active = pills[idx];
+      if (active && nav) {
+        const navRect = nav.getBoundingClientRect();
+        const pillRect = active.getBoundingClientRect();
+        const padding = 22;
+        if (pillRect.left < navRect.left + padding) {
+          nav.scrollTo({ left: active.offsetLeft - padding, behavior: 'smooth' });
+        } else if (pillRect.right > navRect.right - padding) {
+          nav.scrollTo({
+            left: active.offsetLeft - nav.clientWidth + active.offsetWidth + padding,
+            behavior: 'smooth',
+          });
+        }
+      }
+      lastActive = idx;
+    }
   };
   update();
   window.removeEventListener('scroll', window.__miniNavTracker);
@@ -470,6 +492,7 @@ function renderAdmin() {
   draft = serviceToDraft(getService());
   if (!draft.blocks.length) draft.blocks.push(emptyDraftItem('song'));
   document.getElementById('church-name').value = draft.church || '';
+  document.getElementById('subtitle-text').value = draft.subtitle || '';
   document.getElementById('footer-text').value = draft.footer || '';
   paintStylePicker();
   paintEditor();
@@ -486,6 +509,7 @@ function serviceToDraft(service) {
   return {
     church: service.church || '',
     style: service.style === 'b' ? 'b' : 'a',
+    subtitle: service.subtitle || '',
     footer: service.footer || '',
     blocks: (service.blocks || []).map(blockToDraft),
   };
@@ -589,6 +613,7 @@ function paintEditor() {
 document.addEventListener('input', (e) => {
   const t = e.target;
   if (t && t.id === 'church-name') { draft.church = t.value; return; }
+  if (t && t.id === 'subtitle-text') { draft.subtitle = t.value; return; }
   if (t && t.id === 'footer-text') { draft.footer = t.value; return; }
   if (!t || !t.dataset || !t.dataset.field) return;
   const i = Number(t.dataset.index);
@@ -641,6 +666,7 @@ if (saveBtn) saveBtn.addEventListener('click', () => {
   saveService({
     church: (draft.church || '').trim(),
     style: draft.style === 'b' ? 'b' : 'a',
+    subtitle: (draft.subtitle || '').trim(),
     footer: (draft.footer || '').trim(),
     blocks,
   });
