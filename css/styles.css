@@ -1167,9 +1167,8 @@ textarea { resize: vertical; min-height: 180px; line-height: 1.6; font-family: u
   color: #15141a;
   min-height: 100vh;
   min-height: 100dvh;
-  font-family: 'Inter', system-ui, -apple-system, system-ui, sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
   letter-spacing: -0.005em;
-  display: flex;
 }
 #kiosk-view.active { display: flex; }
 
