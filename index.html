@@ -184,7 +184,9 @@
 
     <div class="admin-body">
 
-      <!-- Service date — always visible -->
+      <nav class="service-picker" id="service-picker" aria-label="Services"></nav>
+
+      <!-- Service date / label / delete -->
       <div class="item-card date-card">
         <label for="service-date-input">Service date</label>
         <input type="date" id="service-date-input">
@@ -195,6 +197,8 @@
           <input type="text" id="subtitle-text" placeholder="e.g. Easter Sunday · April 5">
           <div class="field-hint">Overrides the auto-formatted date on the public page.</div>
         </details>
+
+        <button type="button" class="delete-service-btn" data-action="delete-service">Delete this service</button>
       </div>
 
       <div class="editor-toolbar">
