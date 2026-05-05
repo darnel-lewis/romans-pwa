@@ -1282,7 +1282,7 @@ function prettyUrl(u) {
   return u.replace(/^https?:\/\//, '').replace(/\/$/, '');
 }
 
-function renderQR(el, url, pixelSize) {
+function renderQR(el, url) {
   if (!el) return;
   if (typeof qrcode !== 'function') {
     el.textContent = '';
@@ -1296,8 +1296,8 @@ function renderQR(el, url, pixelSize) {
   if (svg) {
     svg.removeAttribute('width');
     svg.removeAttribute('height');
-    svg.style.width = pixelSize + 'px';
-    svg.style.height = pixelSize + 'px';
+    svg.style.width = '100%';
+    svg.style.height = '100%';
     svg.style.display = 'block';
   }
 }
@@ -1309,18 +1309,13 @@ function renderKiosk() {
   document.getElementById('kiosk-subtitle').textContent = subtitleText;
   const url = publicUrl();
   document.getElementById('kiosk-url').textContent = prettyUrl(url);
-  // Slight delay so the layout settles before sizing the SVG.
-  requestAnimationFrame(() => {
-    const target = document.getElementById('kiosk-qr');
-    const size = Math.min(420, Math.floor(Math.min(window.innerWidth, window.innerHeight) * 0.6));
-    renderQR(target, url, size);
-  });
+  renderQR(document.getElementById('kiosk-qr'), url);
 }
 
 function renderAdminShare() {
   const url = publicUrl();
   document.getElementById('admin-url').textContent = prettyUrl(url);
-  renderQR(document.getElementById('admin-qr'), url, 110);
+  renderQR(document.getElementById('admin-qr'), url);
 }
 
 /* Wake Lock + Fullscreen for the kiosk display. Both are best-effort —

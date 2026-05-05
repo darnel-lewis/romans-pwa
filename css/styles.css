@@ -1199,10 +1199,13 @@ textarea { resize: vertical; min-height: 180px; line-height: 1.6; font-family: u
 
 .kiosk-qr {
   margin-top: 8px;
+  width: min(60vmin, 420px);
+  height: min(60vmin, 420px);
   padding: 20px;
   background: #fff;
   border-radius: 18px;
   box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 12px 32px rgba(0,0,0,0.08);
+  overflow: hidden;
 }
 .kiosk-qr svg path,
 .kiosk-qr svg rect { fill: #15141a; }
@@ -1260,6 +1263,7 @@ textarea { resize: vertical; min-height: 180px; line-height: 1.6; font-family: u
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
 }
 .share-qr svg path,
 .share-qr svg rect { fill: #15141a; }
@@ -1754,4 +1758,36 @@ body.modal-open { overflow: hidden; }
   margin-right: auto;
   color: #b00020;
   font-size: .85rem;
+}
+
+/* ============================================================
+   MOBILE TWEAKS — modals + style picker
+   ============================================================ */
+
+@media (max-width: 480px) {
+  .modal-overlay { padding: 2vh .5rem .5rem; }
+  .modal-card {
+    max-height: calc(100vh - 4vh);
+    max-height: calc(100dvh - 4vh);
+    border-radius: 12px;
+  }
+  .modal-head { padding: .85rem 1rem; }
+  .modal-head h3 { font-size: 1rem; }
+  .modal-body { padding: .85rem 1rem 1rem; }
+
+  .style-picker { grid-template-columns: 1fr; }
+
+  .members-invite { flex-direction: column; align-items: stretch; gap: .4rem; }
+  .members-invite .btn { width: 100%; }
+
+  .share-row { flex-direction: column; align-items: flex-start; }
+  .share-actions { width: 100%; }
+  .share-actions .btn { flex: 1 1 auto; }
+
+  .modal-actions { gap: .35rem; }
+  .modal-actions .btn { flex: 1 1 auto; }
+  .modal-action-status { flex: 1 1 100%; margin: 0 0 .3rem; text-align: left; }
+
+  .admin-header { gap: .35rem .5rem; }
+  .admin-tool { padding: .35rem .55rem; font-size: .78rem; }
 }
