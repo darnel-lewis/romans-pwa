@@ -13,6 +13,7 @@ const STORAGE_KEYS = {
   session: 'worship.session',
   service: 'worship.service.v3',
   prefs: 'worship.prefs.v1',
+  songLibrary: 'worship.song-library.v1',
 };
 
 const SEED_SERVICE = {
@@ -178,6 +179,68 @@ function setSession(session) {
 }
 
 function clone(o) { return JSON.parse(JSON.stringify(o)); }
+
+/* ---------- song library ---------- *
+ * Auto-grows on every save: any song an admin saves into a service is
+ * upserted into a per-device library, keyed by normalized title. Powers
+ * the autocomplete dropdown on the song-title input in admin. */
+
+function getSongLibrary() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEYS.songLibrary);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch { return []; }
+}
+
+function saveSongLibrary(arr) {
+  localStorage.setItem(STORAGE_KEYS.songLibrary, JSON.stringify(arr));
+}
+
+function normalizeTitle(t) {
+  return (t || '').toLowerCase().replace(/\s+/g, ' ').trim();
+}
+
+function libraryUpsert(songs) {
+  const lib = getSongLibrary();
+  const byKey = new Map(lib.map((s) => [normalizeTitle(s.title), s]));
+  const now = Date.now();
+  songs.forEach((song) => {
+    const key = normalizeTitle(song.title);
+    if (!key) return;
+    byKey.set(key, {
+      title: song.title,
+      attribution: song.attribution || '',
+      stanzas: song.stanzas || [],
+      lastUsed: now,
+    });
+  });
+  saveSongLibrary(Array.from(byKey.values()));
+}
+
+function librarySearch(query, limit = 8) {
+  const q = (query || '').toLowerCase().trim();
+  const lib = getSongLibrary();
+  if (!q) {
+    return [...lib].sort((a, b) => (b.lastUsed || 0) - (a.lastUsed || 0)).slice(0, limit);
+  }
+  return lib
+    .filter((s) => (s.title || '').toLowerCase().includes(q))
+    .sort((a, b) => {
+      const aStarts = (a.title || '').toLowerCase().startsWith(q);
+      const bStarts = (b.title || '').toLowerCase().startsWith(q);
+      if (aStarts !== bStarts) return aStarts ? -1 : 1;
+      return (b.lastUsed || 0) - (a.lastUsed || 0);
+    })
+    .slice(0, limit);
+}
+
+function ensureLibrarySeed() {
+  if (getSongLibrary().length > 0) return;
+  libraryUpsert((SEED_SERVICE.blocks || []).filter((b) => b.kind === 'song'));
+}
+ensureLibrarySeed();
 
 /* Computes "Sunday · November 23" for the upcoming Sunday — used as the
  * render-time fallback for an unset subtitle so the page always shows
@@ -652,7 +715,14 @@ function paintEditor() {
         </div>
 
         <label for="title-${i}">${item.kind === 'scripture' ? 'Reference' : 'Title'}</label>
-        <input type="text" id="title-${i}" data-field="title" data-index="${i}" value="${escAttr(item.title)}" placeholder="${escAttr(cfg.titlePlaceholder)}">
+        ${item.kind === 'song' ? `
+          <div class="title-wrap">
+            <input type="text" id="title-${i}" data-field="title" data-index="${i}" data-song-title="1" value="${escAttr(item.title)}" placeholder="${escAttr(cfg.titlePlaceholder)}" autocomplete="off">
+            <div class="song-suggest" data-suggest-for="${i}" hidden></div>
+          </div>
+        ` : `
+          <input type="text" id="title-${i}" data-field="title" data-index="${i}" value="${escAttr(item.title)}" placeholder="${escAttr(cfg.titlePlaceholder)}">
+        `}
 
         ${cfg.metaLabel ? `
           <label for="meta-${i}">${esc(cfg.metaLabel)}</label>
@@ -675,6 +745,70 @@ document.addEventListener('input', (e) => {
   if (!t || !t.dataset || !t.dataset.field) return;
   const i = Number(t.dataset.index);
   draft.blocks[i][t.dataset.field] = t.value;
+  if (t.dataset.songTitle) renderSongSuggest(i, t.value);
+});
+
+function renderSongSuggest(index, query) {
+  const dropdown = document.querySelector(`[data-suggest-for="${index}"]`);
+  if (!dropdown) return;
+  const matches = librarySearch(query, 8);
+  if (!matches.length) {
+    dropdown.hidden = true;
+    dropdown.innerHTML = '';
+    return;
+  }
+  dropdown.innerHTML = matches.map((s) => `
+    <button type="button" class="song-suggest-item" data-suggest-pick="${index}" data-suggest-key="${escAttr(normalizeTitle(s.title))}">
+      <div class="song-suggest-title">${esc(s.title)}</div>
+      ${s.attribution ? `<div class="song-suggest-meta">${esc(s.attribution)}</div>` : ''}
+    </button>
+  `).join('');
+  dropdown.hidden = false;
+}
+
+document.addEventListener('focusin', (e) => {
+  const t = e.target;
+  if (t && t.dataset && t.dataset.songTitle) {
+    renderSongSuggest(Number(t.dataset.index), t.value);
+  }
+});
+
+document.addEventListener('focusout', (e) => {
+  const t = e.target;
+  if (t && t.dataset && t.dataset.songTitle) {
+    setTimeout(() => {
+      const dropdown = document.querySelector(`[data-suggest-for="${t.dataset.index}"]`);
+      if (dropdown) dropdown.hidden = true;
+    }, 180);
+  }
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Escape') return;
+  const t = e.target;
+  if (t && t.dataset && t.dataset.songTitle) {
+    const dropdown = document.querySelector(`[data-suggest-for="${t.dataset.index}"]`);
+    if (dropdown) dropdown.hidden = true;
+  }
+});
+
+/* Use mousedown so we beat the input's focusout (which would hide the
+ * dropdown and cancel the click). preventDefault keeps the input focused. */
+document.addEventListener('mousedown', (e) => {
+  const item = e.target.closest('[data-suggest-pick]');
+  if (!item) return;
+  e.preventDefault();
+  const index = Number(item.dataset.suggestPick);
+  const key = item.dataset.suggestKey;
+  const song = getSongLibrary().find((s) => normalizeTitle(s.title) === key);
+  if (!song) return;
+  draft.blocks[index] = blockToDraft({
+    kind: 'song',
+    title: song.title,
+    attribution: song.attribution,
+    stanzas: song.stanzas,
+  });
+  paintEditor();
 });
 
 document.addEventListener('click', (e) => {
@@ -727,6 +861,7 @@ if (saveBtn) saveBtn.addEventListener('click', () => {
     footer: (draft.footer || '').trim(),
     blocks,
   });
+  libraryUpsert(blocks.filter((b) => b.kind === 'song'));
   const msg = document.getElementById('save-message');
   msg.textContent = `Saved ${blocks.length} block${blocks.length === 1 ? '' : 's'}.`;
   setTimeout(() => { msg.textContent = ''; }, 2400);
