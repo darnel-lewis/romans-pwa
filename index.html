@@ -191,58 +191,10 @@
         <div class="field-hint">Shown under the church name. Leave blank to auto-fill with the upcoming Sunday's date.</div>
       </div>
 
-      <!-- Settings — toggleable -->
-      <div class="item-card admin-panel" data-panel-name="settings" hidden>
-        <div class="item-card-head"><span class="item-card-num">Settings</span></div>
-
-        <label for="church-name">Church name</label>
-        <input type="text" id="church-name" placeholder="e.g. The Well">
-
-        <label>Style</label>
-        <div class="style-picker" id="style-picker">
-          <button type="button" class="style-option" data-style="a">
-            <span class="style-option-label">A</span>
-            <span class="style-option-name">Modern Minimal</span>
-          </button>
-          <button type="button" class="style-option" data-style="b">
-            <span class="style-option-label">B</span>
-            <span class="style-option-name">Quiet &amp; Contemplative</span>
-          </button>
-        </div>
-
-        <label for="footer-text">Footer text</label>
-        <input type="text" id="footer-text" placeholder="e.g. Soli Deo Gloria">
-        <div class="field-hint">Shown at the bottom of the public page.</div>
-      </div>
-
-      <!-- Library — toggleable -->
-      <div class="item-card admin-panel" data-panel-name="library" hidden>
-        <div class="item-card-head">
-          <span class="item-card-num">Song library</span>
-          <span class="library-hint">Songs you save are kept here. Tap delete to remove.</span>
-        </div>
-        <div class="library-actions">
-          <button type="button" class="btn btn-ghost" data-action="library-export">Download backup</button>
-          <button type="button" class="btn btn-ghost" data-action="library-import">Restore from backup</button>
-          <input type="file" id="library-import-input" accept="application/json,.json" hidden>
-        </div>
-        <div id="library-list" class="library-list"></div>
-      </div>
-
-      <!-- Share — toggleable -->
-      <div class="item-card admin-panel" data-panel-name="share" hidden>
-        <div class="item-card-head"><span class="item-card-num">Share</span></div>
-        <div class="share-row">
-          <div class="share-qr" id="admin-qr" aria-label="QR code preview"></div>
-          <div class="share-info">
-            <div class="share-label">Public URL</div>
-            <div class="share-url" id="admin-url"></div>
-            <div class="share-actions">
-              <a href="#kiosk" class="btn btn-ghost" target="_blank" rel="noopener">Open kiosk</a>
-              <button type="button" class="btn btn-ghost" data-action="email-link">Email link</button>
-            </div>
-          </div>
-        </div>
+      <div class="editor-toolbar">
+        <span class="editor-toolbar-label">Service order</span>
+        <button type="button" class="admin-tool" data-action="collapse-all">Collapse all</button>
+        <button type="button" class="admin-tool" data-action="expand-all">Expand all</button>
       </div>
 
       <div id="song-editor"></div>
@@ -260,6 +212,91 @@
       </div>
       <div id="save-message" class="save-message"></div>
     </div>
+
+    <!-- Modals (Settings / Library / Share) -->
+    <div class="modal-overlay" data-modal="settings" hidden>
+      <div class="modal-card" role="dialog" aria-label="Settings">
+        <div class="modal-head">
+          <h3>Settings</h3>
+          <button type="button" class="modal-close" data-action="close-modal" aria-label="Close">×</button>
+        </div>
+        <div class="modal-body">
+
+          <label for="church-name">Church name</label>
+          <input type="text" id="church-name" placeholder="e.g. The Well">
+
+          <label>Style</label>
+          <div class="style-picker" id="style-picker">
+            <button type="button" class="style-option" data-style="a">
+              <span class="style-option-label">A</span>
+              <span class="style-option-name">Modern Minimal</span>
+            </button>
+            <button type="button" class="style-option" data-style="b">
+              <span class="style-option-label">B</span>
+              <span class="style-option-name">Quiet &amp; Contemplative</span>
+            </button>
+          </div>
+
+          <label for="footer-text">Footer text</label>
+          <input type="text" id="footer-text" placeholder="e.g. Soli Deo Gloria">
+          <div class="field-hint">Shown at the bottom of the public page.</div>
+
+          <div class="settings-divider"></div>
+
+          <div class="members-head">
+            <span class="members-title">Members</span>
+            <span class="members-pending-tag">Coming with accounts</span>
+          </div>
+          <div class="members-list" id="members-list"></div>
+          <div class="members-invite">
+            <input type="email" id="invite-email" placeholder="invite by email" autocomplete="off">
+            <button type="button" class="btn btn-ghost" data-action="invite-member">Send invite</button>
+          </div>
+          <div class="field-hint">Add co-editors so a backup leader can update next Sunday's service. Real invites will fire when accounts are live; for now this is a placeholder.</div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-overlay" data-modal="library" hidden>
+      <div class="modal-card" role="dialog" aria-label="Song library">
+        <div class="modal-head">
+          <h3>Song library</h3>
+          <button type="button" class="modal-close" data-action="close-modal" aria-label="Close">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="library-actions">
+            <button type="button" class="btn btn-ghost" data-action="library-export">Download backup</button>
+            <button type="button" class="btn btn-ghost" data-action="library-import">Restore from backup</button>
+            <input type="file" id="library-import-input" accept="application/json,.json" hidden>
+          </div>
+          <div id="library-list" class="library-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-overlay" data-modal="share" hidden>
+      <div class="modal-card" role="dialog" aria-label="Share">
+        <div class="modal-head">
+          <h3>Share</h3>
+          <button type="button" class="modal-close" data-action="close-modal" aria-label="Close">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="share-row">
+            <div class="share-qr" id="admin-qr" aria-label="QR code preview"></div>
+            <div class="share-info">
+              <div class="share-label">Public URL</div>
+              <div class="share-url" id="admin-url"></div>
+              <div class="share-actions">
+                <a href="#kiosk" class="btn btn-ghost" target="_blank" rel="noopener">Open kiosk</a>
+                <button type="button" class="btn btn-ghost" data-action="email-link">Email link</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </section>
 
   <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>

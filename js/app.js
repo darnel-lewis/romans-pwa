@@ -558,29 +558,44 @@ document.addEventListener('change', (e) => {
   }
 });
 
-/* ---------- admin panels (Settings / Library / Share) ----------
- * One open at a time. Re-clicking the toggle closes the panel. */
+/* ---------- admin modals (Settings / Library / Share) ----------
+ * Modal overlays — one open at a time. Re-clicking the toggle closes. */
 function togglePanel(name) {
-  const panels = document.querySelectorAll('.admin-panel');
-  let opened = false;
-  panels.forEach((el) => {
-    if (el.dataset.panelName === name) {
-      const wasHidden = el.hasAttribute('hidden');
-      if (wasHidden) {
-        el.removeAttribute('hidden');
-        opened = true;
-      } else {
-        el.setAttribute('hidden', '');
-      }
-    } else {
-      el.setAttribute('hidden', '');
-    }
-  });
-  document.querySelectorAll('.admin-tool').forEach((btn) => {
-    btn.classList.toggle('is-active', opened && btn.dataset.panel === name);
-  });
-  if (opened && name === 'library') renderLibraryList();
-  if (opened && name === 'share') renderAdminShare();
+  const target = document.querySelector(`.modal-overlay[data-modal="${name}"]`);
+  if (!target) return;
+  const wasOpen = !target.hasAttribute('hidden');
+  document.querySelectorAll('.modal-overlay').forEach((el) => el.setAttribute('hidden', ''));
+  document.querySelectorAll('.admin-tool[data-action="toggle-panel"]').forEach((b) =>
+    b.classList.remove('is-active')
+  );
+  if (!wasOpen) {
+    target.removeAttribute('hidden');
+    document.body.classList.add('modal-open');
+    const btn = document.querySelector(`.admin-tool[data-panel="${name}"]`);
+    if (btn) btn.classList.add('is-active');
+    if (name === 'library') renderLibraryList();
+    if (name === 'share') renderAdminShare();
+    if (name === 'settings') renderMembersList();
+    const focusable = target.querySelector('input, button.modal-close');
+    if (focusable) setTimeout(() => focusable.focus(), 50);
+  } else {
+    document.body.classList.remove('modal-open');
+  }
+}
+
+function renderMembersList() {
+  const el = document.getElementById('members-list');
+  if (!el) return;
+  const session = getSession();
+  const youEmail = (session && session.email) || 'you@example.com';
+  el.innerHTML = `
+    <div class="member-row">
+      <div class="member-info">
+        <div class="member-email">${esc(youEmail)}</div>
+        <div class="member-meta">Owner · you</div>
+      </div>
+    </div>
+  `;
 }
 
 function renderLibraryList() {
@@ -814,41 +829,53 @@ function emptyDraftItem(kind) {
 
 function editorEl() { return document.getElementById('song-editor'); }
 
+/* Each draft block gets a stable client-side id so collapse state survives
+ * reordering and edits without needing to re-find by index. */
+const collapsedIds = new Set();
+function ensureDraftIds() {
+  draft.blocks.forEach((b) => {
+    if (!b._id) b._id = '_' + Math.random().toString(36).slice(2, 10);
+  });
+}
+
 function paintEditor() {
+  ensureDraftIds();
   editorEl().innerHTML = draft.blocks.map((item, i) => {
     const cfg = ITEM_TYPES[item.kind] || ITEM_TYPES.note;
-    const last = i === draft.blocks.length - 1;
-    const first = i === 0;
+    const collapsed = collapsedIds.has(item._id);
+    const summary = (item.title || '').trim() || `Untitled ${cfg.label.toLowerCase()}`;
     return `
-      <div class="item-card" data-index="${i}">
+      <div class="item-card ${collapsed ? 'is-collapsed' : ''}" data-index="${i}" data-block-id="${escAttr(item._id)}">
         <div class="item-card-head">
           <span class="drag-handle" aria-label="Drag to reorder" title="Drag to reorder">⋮⋮</span>
-          <span class="item-card-num">${esc(cfg.label)} · ${i + 1}</span>
+          <span class="item-card-num">${esc(cfg.label)}</span>
+          <span class="item-card-summary">${esc(summary)}</span>
           <div class="item-card-actions">
-            <button type="button" class="icon-btn" data-action="up" data-index="${i}" ${first ? 'disabled' : ''} aria-label="Move up">↑</button>
-            <button type="button" class="icon-btn" data-action="down" data-index="${i}" ${last ? 'disabled' : ''} aria-label="Move down">↓</button>
+            <button type="button" class="icon-btn collapse-btn" data-action="toggle-collapse" aria-label="${collapsed ? 'Expand' : 'Collapse'}">${collapsed ? '▸' : '▾'}</button>
             <button type="button" class="remove-btn" data-action="remove" data-index="${i}">Remove</button>
           </div>
         </div>
 
-        <label for="title-${i}">${item.kind === 'scripture' ? 'Reference' : 'Title'}</label>
-        ${item.kind === 'song' ? `
-          <div class="title-wrap">
-            <input type="text" id="title-${i}" data-field="title" data-index="${i}" data-song-title="1" value="${escAttr(item.title)}" placeholder="${escAttr(cfg.titlePlaceholder)}" autocomplete="off">
-            <div class="song-suggest" data-suggest-for="${i}" hidden></div>
-          </div>
-        ` : `
-          <input type="text" id="title-${i}" data-field="title" data-index="${i}" value="${escAttr(item.title)}" placeholder="${escAttr(cfg.titlePlaceholder)}">
-        `}
+        <div class="item-card-body">
+          <label for="title-${i}">${item.kind === 'scripture' ? 'Reference' : 'Title'}</label>
+          ${item.kind === 'song' ? `
+            <div class="title-wrap">
+              <input type="text" id="title-${i}" data-field="title" data-index="${i}" data-song-title="1" value="${escAttr(item.title)}" placeholder="${escAttr(cfg.titlePlaceholder)}" autocomplete="off">
+              <div class="song-suggest" data-suggest-for="${i}" hidden></div>
+            </div>
+          ` : `
+            <input type="text" id="title-${i}" data-field="title" data-index="${i}" value="${escAttr(item.title)}" placeholder="${escAttr(cfg.titlePlaceholder)}">
+          `}
 
-        ${cfg.metaLabel ? `
-          <label for="meta-${i}">${esc(cfg.metaLabel)}</label>
-          <input type="text" id="meta-${i}" data-field="meta" data-index="${i}" value="${escAttr(item.meta)}" placeholder="${escAttr(cfg.metaPlaceholder)}">
-        ` : ''}
+          ${cfg.metaLabel ? `
+            <label for="meta-${i}">${esc(cfg.metaLabel)}</label>
+            <input type="text" id="meta-${i}" data-field="meta" data-index="${i}" value="${escAttr(item.meta)}" placeholder="${escAttr(cfg.metaPlaceholder)}">
+          ` : ''}
 
-        <label for="body-${i}">${esc(cfg.bodyLabel)}</label>
-        <textarea id="body-${i}" data-field="body" data-index="${i}" placeholder="${escAttr(cfg.bodyPlaceholder)}">${esc(item.body)}</textarea>
-        <div class="field-hint">${esc(cfg.bodyHint)}</div>
+          <label for="body-${i}">${esc(cfg.bodyLabel)}</label>
+          <textarea id="body-${i}" data-field="body" data-index="${i}" placeholder="${escAttr(cfg.bodyPlaceholder)}">${esc(item.body)}</textarea>
+          <div class="field-hint">${esc(cfg.bodyHint)}</div>
+        </div>
       </div>
     `;
   }).join('');
@@ -963,14 +990,10 @@ document.addEventListener('click', (e) => {
   const i = t.dataset.index !== undefined ? Number(t.dataset.index) : null;
 
   if (action === 'remove' && i !== null) {
+    const removed = draft.blocks[i];
+    if (removed && removed._id) collapsedIds.delete(removed._id);
     draft.blocks.splice(i, 1);
     if (!draft.blocks.length) draft.blocks.push(emptyDraftItem('song'));
-    paintEditor();
-  } else if (action === 'up' && i !== null && i > 0) {
-    [draft.blocks[i - 1], draft.blocks[i]] = [draft.blocks[i], draft.blocks[i - 1]];
-    paintEditor();
-  } else if (action === 'down' && i !== null && i < draft.blocks.length - 1) {
-    [draft.blocks[i + 1], draft.blocks[i]] = [draft.blocks[i], draft.blocks[i + 1]];
     paintEditor();
   } else if (action === 'add') {
     const kind = t.dataset.type || 'song';
@@ -978,8 +1001,63 @@ document.addEventListener('click', (e) => {
     paintEditor();
     const last = editorEl().querySelector('.item-card:last-child input');
     if (last) last.focus();
+  } else if (action === 'toggle-collapse') {
+    const card = t.closest('.item-card');
+    if (!card) return;
+    const id = card.dataset.blockId;
+    if (collapsedIds.has(id)) collapsedIds.delete(id);
+    else collapsedIds.add(id);
+    card.classList.toggle('is-collapsed');
+    t.textContent = card.classList.contains('is-collapsed') ? '▸' : '▾';
+    t.setAttribute('aria-label', card.classList.contains('is-collapsed') ? 'Expand' : 'Collapse');
+  } else if (action === 'collapse-all') {
+    draft.blocks.forEach((b) => collapsedIds.add(b._id));
+    paintEditor();
+  } else if (action === 'expand-all') {
+    collapsedIds.clear();
+    paintEditor();
+  } else if (action === 'invite-member') {
+    inviteMemberStub();
+  } else if (action === 'close-modal') {
+    closeModals();
   }
 });
+
+/* Click backdrop closes the modal; clicks inside the card don't. */
+document.addEventListener('click', (e) => {
+  const overlay = e.target.closest('.modal-overlay');
+  if (!overlay) return;
+  if (e.target === overlay) closeModals();
+});
+
+/* Escape closes any open modal. */
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Escape') return;
+  const open = document.querySelector('.modal-overlay:not([hidden])');
+  if (open) closeModals();
+});
+
+function closeModals() {
+  document.querySelectorAll('.modal-overlay').forEach((el) => el.setAttribute('hidden', ''));
+  document.querySelectorAll('.admin-tool[data-action="toggle-panel"]').forEach((b) =>
+    b.classList.remove('is-active')
+  );
+  document.body.classList.remove('modal-open');
+}
+
+function inviteMemberStub() {
+  const input = document.getElementById('invite-email');
+  const email = (input && input.value || '').trim();
+  if (!email) {
+    alert('Enter an email address first.');
+    return;
+  }
+  alert(
+    `Got it — ${email} will be invited as a co-editor once accounts are live.\n\n` +
+    'Until then, this is a placeholder so you can see how the flow will work.'
+  );
+  if (input) input.value = '';
+}
 
 const saveBtn = document.getElementById('save-btn');
 if (saveBtn) saveBtn.addEventListener('click', () => {
