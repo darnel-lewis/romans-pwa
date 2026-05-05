@@ -243,8 +243,8 @@ function ensureLibrarySeed() {
 ensureLibrarySeed();
 
 /* Computes "Sunday · November 23" for the upcoming Sunday — used as the
- * render-time fallback for an unset subtitle so the page always shows
- * something date-like rather than a generic "Order of Service" stub. */
+ * render-time fallback for legacy services that have neither a service.date
+ * nor a service.subtitle set. */
 function defaultSubtitle() {
   const d = new Date();
   const daysUntilSunday = (7 - d.getDay()) % 7 || 7;
@@ -252,6 +252,43 @@ function defaultSubtitle() {
   const day = d.toLocaleDateString(undefined, { weekday: 'long' });
   const monthDay = d.toLocaleDateString(undefined, { month: 'long', day: 'numeric' });
   return `${day} · ${monthDay}`;
+}
+
+/* Returns the ISO date (YYYY-MM-DD) for the upcoming Sunday — used as
+ * the default value of the date picker when a service has no date set. */
+function nextSundayISO() {
+  const d = new Date();
+  const days = (7 - d.getDay()) % 7 || 7;
+  d.setDate(d.getDate() + days);
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
+}
+
+/* Formats a YYYY-MM-DD string as "Sunday · November 23". Returns '' on
+ * invalid input. Date is parsed in local time so users see the day they
+ * picked, not a UTC-shifted neighbor. */
+function formatServiceDate(dateStr) {
+  if (!dateStr) return '';
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateStr);
+  if (!m) return '';
+  const date = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+  if (isNaN(date.getTime())) return '';
+  const weekday = date.toLocaleDateString(undefined, { weekday: 'long' });
+  const monthDay = date.toLocaleDateString(undefined, { month: 'long', day: 'numeric' });
+  return `${weekday} · ${monthDay}`;
+}
+
+/* Resolves what should appear under the church name on the public page.
+ * Custom subtitle wins; otherwise the formatted service date; otherwise
+ * the next-Sunday default (legacy services). */
+function displayedSubtitle(service) {
+  const custom = (service.subtitle || '').trim();
+  if (custom) return custom;
+  const fromDate = formatServiceDate(service.date);
+  if (fromDate) return fromDate;
+  return defaultSubtitle();
 }
 
 /* ---------- routing ---------- */
@@ -425,7 +462,7 @@ function renderWorship() {
 
   const churchEl = document.getElementById('hdr-church');
   if (style === 'a') {
-    churchEl.textContent = (service.subtitle || '').trim() || defaultSubtitle();
+    churchEl.textContent = displayedSubtitle(service);
   } else {
     churchEl.textContent = '';
   }
@@ -740,13 +777,34 @@ function renderAdmin() {
   document.getElementById('signed-in-as').textContent = session ? session.email : '';
   draft = serviceToDraft(getService());
   if (!draft.blocks.length) draft.blocks.push(emptyDraftItem('song'));
+  if (!draft.date) draft.date = nextSundayISO();
   document.getElementById('church-name').value = draft.church || '';
+  document.getElementById('service-date-input').value = draft.date || '';
   document.getElementById('subtitle-text').value = draft.subtitle || '';
   document.getElementById('footer-text').value = draft.footer || '';
+  // Auto-open the custom-label section if there's already a custom subtitle
+  const labelSection = document.getElementById('custom-label-section');
+  if (labelSection) labelSection.open = !!(draft.subtitle && draft.subtitle.trim());
   paintStylePicker();
   paintEditor();
+  updateAdminTitle();
+  updateDatePreview();
   // Share QR is generated lazily when the Share modal opens (togglePanel),
   // not on every admin load — keeps it out of the DOM until needed.
+}
+
+function updateAdminTitle() {
+  const el = document.getElementById('admin-page-title');
+  if (!el) return;
+  const formatted = formatServiceDate(draft.date);
+  el.textContent = formatted || 'Edit service';
+}
+
+function updateDatePreview() {
+  const el = document.getElementById('date-preview');
+  if (!el) return;
+  const formatted = formatServiceDate(draft.date);
+  el.textContent = formatted ? `Will display as: ${formatted}` : '';
 }
 
 function paintStylePicker() {
@@ -760,6 +818,7 @@ function serviceToDraft(service) {
   return {
     church: service.church || '',
     style: service.style === 'b' ? 'b' : 'a',
+    date: service.date || '',
     subtitle: service.subtitle || '',
     footer: service.footer || '',
     blocks: (service.blocks || []).map(blockToDraft),
@@ -907,6 +966,13 @@ function initSortable() {
 document.addEventListener('input', (e) => {
   const t = e.target;
   if (t && t.id === 'church-name') { draft.church = t.value; scheduleAutoSave(); return; }
+  if (t && t.id === 'service-date-input') {
+    draft.date = t.value;
+    updateAdminTitle();
+    updateDatePreview();
+    scheduleAutoSave();
+    return;
+  }
   if (t && t.id === 'subtitle-text') { draft.subtitle = t.value; scheduleAutoSave(); return; }
   if (t && t.id === 'footer-text') { draft.footer = t.value; scheduleAutoSave(); return; }
   if (!t || !t.dataset || !t.dataset.field) return;
@@ -1226,6 +1292,7 @@ function performSave({ silent = false } = {}) {
   saveService({
     church: (draft.church || '').trim(),
     style: draft.style === 'b' ? 'b' : 'a',
+    date: (draft.date || '').trim(),
     subtitle: (draft.subtitle || '').trim(),
     footer: (draft.footer || '').trim(),
     blocks,
@@ -1306,8 +1373,7 @@ function renderQR(el, url) {
 function renderKiosk() {
   const service = getService();
   document.getElementById('kiosk-church').textContent = service.church || '';
-  const subtitleText = (service.subtitle || '').trim() || defaultSubtitle();
-  document.getElementById('kiosk-subtitle').textContent = subtitleText;
+  document.getElementById('kiosk-subtitle').textContent = displayedSubtitle(service);
   const url = publicUrl();
   document.getElementById('kiosk-url').textContent = prettyUrl(url);
   renderQR(document.getElementById('kiosk-qr'), url);
