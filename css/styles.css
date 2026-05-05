@@ -1799,11 +1799,9 @@ body.modal-open { overflow: hidden; }
   .modal-actions .btn { flex: 1 1 auto; }
   .modal-action-status { flex: 1 1 100%; margin: 0 0 .3rem; text-align: left; }
 
-  .admin-header { gap: .35rem .5rem; }
-  .admin-header h2 { width: 100%; font-size: 1.4rem; }
-  .admin-actions { width: 100%; gap: .35rem; }
+  .admin-header { gap: .5rem; align-items: center; }
+  .admin-header h2 { font-size: 1.35rem; }
   .admin-tool { padding: .35rem .55rem; font-size: .78rem; }
-  .signed-in { display: none; }
 }
 
 /* ============================================================
@@ -1990,3 +1988,19 @@ body.modal-open { overflow: hidden; }
   cursor: pointer;
 }
 .admin-menu-item:hover { background: #f7f5f0; }
+
+.admin-menu-email {
+  font-size: .78rem;
+  color: #8a8a8a;
+  padding: .5rem .7rem .35rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.admin-menu-email:empty { display: none; }
+
+.admin-menu-divider {
+  height: 1px;
+  background: #ece7da;
+  margin: 4px 6px;
+}
