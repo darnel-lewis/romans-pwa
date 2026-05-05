@@ -791,7 +791,12 @@ function emailKioskLink() {
   const body =
     `Open this link on your tablet (or any phone) to display today's QR code for the congregation:\n\n` +
     kioskUrl() + `\n\n` +
-    `Anyone who scans the code lands on the worship page:\n` + publicUrl();
+    `Anyone who scans the code lands on the worship page:\n` + publicUrl() + `\n\n` +
+    `---\n` +
+    `Want to show the lyrics on a TV instead?\n\n` +
+    `• Chromecast: open ${publicUrl()} in Chrome, then ⋮ → Cast → pick your TV.\n` +
+    `• Apple TV: open the link on an iPad, swipe down for Control Center → Screen Mirroring → pick your Apple TV.\n` +
+    `• HDMI: plug a laptop, phone, or tablet into the TV with a cable; the worship page appears on screen.`;
   window.location.href =
     `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }
