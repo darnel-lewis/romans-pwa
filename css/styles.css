@@ -1594,9 +1594,28 @@ body.modal-open { overflow: hidden; }
 .modal-close:hover { color: #1a1a1a; }
 
 .modal-body {
-  padding: 1rem 1.25rem 1.25rem;
+  padding: 1rem 1.25rem 1.5rem;
   overflow-y: auto;
 }
+
+/* Breathing room between form groups in modals */
+.modal-body label {
+  display: block;
+  margin-top: 1.4rem;
+  margin-bottom: .4rem;
+}
+.modal-body > label:first-of-type,
+.modal-body > .modal-hint + label,
+.modal-body > .modal-hint + .bulk-actions + label {
+  margin-top: 0;
+}
+.modal-body input[type="text"],
+.modal-body input[type="email"],
+.modal-body input[type="date"] {
+  margin-bottom: .25rem;
+}
+.modal-body .style-picker { margin-top: .35rem; }
+.modal-body .field-hint { margin-top: .35rem; margin-bottom: .25rem; }
 
 /* Editor toolbar above the song-editor */
 .editor-toolbar {
