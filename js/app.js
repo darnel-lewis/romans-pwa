@@ -1005,20 +1005,37 @@ function updateServiceHeader() {
   if (!monthEl || !dayEl || !labelEl || !valueEl) return;
 
   const m = (draft.date || '').match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  let weekday = '';
   if (m) {
     const date = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
     monthEl.textContent = date.toLocaleDateString(undefined, { month: 'short' });
     dayEl.textContent = String(Number(m[3]));
-    const weekday = date.toLocaleDateString(undefined, { weekday: 'long' });
-    labelEl.textContent = `Service · ${weekday}`;
+    weekday = date.toLocaleDateString(undefined, { weekday: 'long' });
   } else {
     monthEl.textContent = '—';
     dayEl.textContent = '—';
-    labelEl.textContent = 'Service';
   }
-  const account = getAccount();
+
+  const today = todayISO();
+  const isToday = draft.date && draft.date === today;
+  labelEl.textContent = isToday && weekday
+    ? `Today · ${weekday}`
+    : (weekday || 'Service');
+
   const sub = (draft.subtitle || '').trim();
-  valueEl.textContent = sub ? `${account.church || ''} · ${sub}` : (account.church || '');
+  if (sub) {
+    valueEl.textContent = sub;
+  } else {
+    const services = getServices();
+    const live = getLiveService(services);
+    const isLive = live && live.id === draft.id;
+    let status;
+    if (isLive) status = 'Live now';
+    else if (draft.date && draft.date > today) status = 'Scheduled';
+    else status = 'Past';
+    const n = draft.blocks.length;
+    valueEl.textContent = `${status} · ${n} item${n === 1 ? '' : 's'}`;
+  }
 }
 
 function updateDatePreview() {
@@ -1209,9 +1226,11 @@ function paintEditor() {
 
 function updateSectionCount() {
   const el = document.getElementById('section-head-label');
-  if (!el) return;
-  const n = draft.blocks.length;
-  el.textContent = `Service order · ${n} item${n === 1 ? '' : 's'}`;
+  if (el) {
+    const n = draft.blocks.length;
+    el.textContent = `Service order · ${n} item${n === 1 ? '' : 's'}`;
+  }
+  updateServiceHeader();
 }
 
 function initSortable() {
@@ -1245,7 +1264,12 @@ document.addEventListener('input', (e) => {
     scheduleAutoSave();
     return;
   }
-  if (t && t.id === 'subtitle-text') { draft.subtitle = t.value; scheduleAutoSave(); return; }
+  if (t && t.id === 'subtitle-text') {
+    draft.subtitle = t.value;
+    updateServiceHeader();
+    scheduleAutoSave();
+    return;
+  }
   if (t && t.id === 'footer-text') { draft.footer = t.value; scheduleAutoSave(); return; }
   if (!t || !t.dataset || !t.dataset.field) return;
   const i = Number(t.dataset.index);
