@@ -2209,7 +2209,7 @@ body.modal-open { overflow: hidden; }
 .service-header {
   margin: 18px 22px 0;
   background: var(--paper-alt);
-  border: 1px solid var(--plan-rule-soft);
+  border: 1.5px solid var(--plan-ink);
   border-radius: 14px;
   overflow: hidden;
 }
@@ -2238,7 +2238,7 @@ body.modal-open { overflow: hidden; }
   width: 40px;
   height: 40px;
   border-radius: 10px;
-  background: var(--plan-accent);
+  background: var(--plan-ink);
   color: var(--paper);
   display: flex;
   flex-direction: column;
