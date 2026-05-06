@@ -225,12 +225,14 @@
       </div>
 
       <div class="save-bar">
-        <span class="save-status" id="save-status" data-state="idle"></span>
         <button type="button" class="btn btn-ghost" data-action="toggle-panel" data-panel="share">Share</button>
         <a href="#" class="btn btn-ghost" data-action="open-preview">Preview</a>
         <button class="btn btn-primary" id="save-btn">Save now</button>
       </div>
-      <div id="save-message" class="save-message"></div>
+      <div class="save-bar-meta">
+        <span class="save-status" id="save-status" data-state="idle"></span>
+        <span id="save-message" class="save-message"></span>
+      </div>
     </div>
 
     <!-- Modals (Settings / Library / Share) -->
