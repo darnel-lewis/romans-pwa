@@ -171,11 +171,15 @@
 
   <!-- Admin / editor view -->
   <section id="admin-view" class="view">
-    <header class="admin-header">
-      <h2 id="admin-page-title">Edit services</h2>
+
+    <!-- Top bar: small wordmark + hamburger -->
+    <div class="plan-topbar">
+      <div class="plan-eyebrow">Today&rsquo;s Worship</div>
       <div class="admin-menu-wrap">
-        <button type="button" class="admin-tool admin-menu-toggle" data-action="toggle-admin-menu" aria-label="Menu" aria-haspopup="true" aria-expanded="false">
-          <span aria-hidden="true">☰</span>
+        <button type="button" class="plan-icon-btn" data-action="toggle-admin-menu" aria-label="Menu" aria-haspopup="true" aria-expanded="false">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+            <path d="M2 4h12M2 8h12M2 12h12"/>
+          </svg>
         </button>
         <div class="admin-menu" id="admin-menu" hidden>
           <div class="admin-menu-email" id="signed-in-as"></div>
@@ -187,51 +191,80 @@
           <button type="button" class="admin-menu-item" id="logout-btn">Sign out</button>
         </div>
       </div>
-    </header>
+    </div>
 
-    <div class="admin-body">
+    <!-- Page title -->
+    <div class="plan-title">
+      <h1 id="admin-page-title">Plan</h1>
+      <div class="plan-sub">Build Sunday&rsquo;s program. Reorder, edit, and publish.</div>
+    </div>
 
-      <nav class="service-picker" id="service-picker" aria-label="Services"></nav>
+    <!-- Date switcher (sticky) -->
+    <div class="switcher-wrap">
+      <nav class="switcher-row" id="service-picker" aria-label="Services"></nav>
+    </div>
 
-      <!-- Service date / label / delete -->
-      <div class="item-card date-card">
-        <label for="service-date-input">Service date</label>
-        <input type="date" id="service-date-input">
-        <div class="date-preview" id="date-preview"></div>
-
-        <details class="custom-label-section" id="custom-label-section">
-          <summary>Use a custom label instead</summary>
-          <input type="text" id="subtitle-text" placeholder="e.g. Easter Sunday · April 5">
-          <div class="field-hint">Overrides the auto-formatted date on the public page.</div>
-        </details>
-
-        <button type="button" class="delete-service-btn" data-action="delete-service">Delete this service</button>
+    <!-- Service header card (collapsible date / details) -->
+    <details class="service-header" id="service-header" open>
+      <summary>
+        <div class="sh-icon">
+          <span class="mo" id="sh-month"></span>
+          <span class="day" id="sh-day"></span>
+        </div>
+        <div class="sh-text">
+          <div class="label" id="sh-label">Service</div>
+          <div class="value" id="sh-value"></div>
+        </div>
+      </summary>
+      <div class="sh-body">
+        <div class="sh-field">
+          <span class="sf-label">Date</span>
+          <input class="sh-input" type="date" id="service-date-input">
+          <div class="sh-helper" id="date-preview"></div>
+        </div>
+        <div class="sh-field">
+          <span class="sf-label">Custom label (optional)</span>
+          <input class="sh-input" type="text" id="subtitle-text" placeholder="e.g. Easter Sunday · April 5">
+          <div class="sh-helper">Overrides the auto-formatted date on the public page.</div>
+        </div>
+        <button type="button" class="sh-delete" data-action="delete-service">Delete this service</button>
       </div>
+    </details>
 
-      <div class="editor-toolbar">
-        <span class="editor-toolbar-label">Service order</span>
-        <button type="button" class="admin-tool" data-action="open-bulk-paste">Bulk paste</button>
-        <button type="button" class="admin-tool" data-action="collapse-all">Collapse all</button>
-        <button type="button" class="admin-tool" data-action="expand-all">Expand all</button>
+    <!-- Section head -->
+    <div class="section-head">
+      <h2 id="section-head-label">Service order · 0 items</h2>
+      <div class="actions">
+        <button type="button" class="ghost-btn" data-action="open-bulk-paste">Bulk paste</button>
+        <button type="button" class="ghost-btn" data-action="collapse-all">Collapse all</button>
+        <button type="button" class="ghost-btn" data-action="expand-all">Expand all</button>
       </div>
+    </div>
 
-      <div id="song-editor"></div>
+    <!-- Items -->
+    <div class="items" id="song-editor"></div>
 
-      <div class="add-row">
-        <span class="add-label">Add</span>
-        <button class="btn btn-secondary" data-action="add" data-type="song">+ Song</button>
-        <button class="btn btn-secondary" data-action="add" data-type="scripture">+ Scripture</button>
-        <button class="btn btn-secondary" data-action="add" data-type="note">+ Note</button>
-      </div>
+    <!-- Add item row -->
+    <div class="add-item">
+      <button type="button" class="add-chip" data-action="add" data-type="song"><span class="plus">＋</span> Song</button>
+      <button type="button" class="add-chip" data-action="add" data-type="scripture"><span class="plus">＋</span> Scripture</button>
+      <button type="button" class="add-chip" data-action="add" data-type="note"><span class="plus">＋</span> Note</button>
+    </div>
 
-      <div class="save-bar">
-        <button type="button" class="btn btn-ghost" data-action="toggle-panel" data-panel="share">Share</button>
-        <a href="#" class="btn btn-ghost" data-action="open-preview">Preview</a>
-        <button class="btn btn-primary" id="save-btn">Save now</button>
-      </div>
-      <div class="save-bar-meta">
-        <span class="save-status" id="save-status" data-state="idle"></span>
-        <span id="save-message" class="save-message"></span>
+    <!-- Status line -->
+    <div class="status-line">
+      <span class="status-dot" id="status-line-dot"></span>
+      <span class="save-status" id="save-status" data-state="idle"></span>
+      <span id="save-message" class="save-message"></span>
+    </div>
+
+    <!-- Bottom action bar -->
+    <div class="bottom-bar">
+      <div class="bottom-bar-inner">
+        <a href="#" class="secondary-btn" data-action="open-preview">Preview</a>
+        <button type="button" class="primary-btn" data-action="toggle-panel" data-panel="share">
+          <span class="primary-dot"></span> Share with congregation
+        </button>
       </div>
     </div>
 

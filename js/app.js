@@ -944,6 +944,7 @@ function renderAdmin() {
   paintServicePicker();
   updateAdminTitle();
   updateDatePreview();
+  setSaveStatus('saved', 'Saved · live for the congregation');
 }
 
 /* Renders the horizontal service-picker bar. One pill per saved service
@@ -955,29 +956,69 @@ function paintServicePicker() {
   const services = [...getServices()].sort((a, b) => (a.date || '').localeCompare(b.date || ''));
   const live = getLiveService(services);
   const liveId = live ? live.id : null;
+  const today = todayISO();
+
+  const pillLabel = (s) => {
+    if (!s.date) return 'No date';
+    const m = s.date.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (!m) return s.date;
+    const date = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+    const month = date.toLocaleDateString(undefined, { month: 'short' });
+    const day = Number(m[3]);
+    let label = `${month} ${day}`;
+    if (s.date === today) label += ' · today';
+    else if (s.id === liveId) label += ' · live';
+    return label;
+  };
+
+  const dotClass = (s) => {
+    if (s.id === liveId) return 'live';
+    if (s.date && s.date > today) return 'scheduled';
+    return '';
+  };
+
   const html = services.map((s) => {
-    const formatted = formatServiceDate(s.date);
-    const label = formatted ? formatted.split(' · ')[1] || formatted : 'No date';
     const isActive = s.id === draft.id;
-    const isLive = s.id === liveId;
     return `
-      <button type="button" class="service-pill ${isActive ? 'is-active' : ''} ${isLive ? 'is-live' : ''}"
-        data-action="switch-service" data-service-id="${escAttr(s.id)}"
-        title="${isLive ? 'Currently live on the public page' : ''}">
-        ${isLive ? '<span class="service-live-dot" aria-label="Live"></span>' : ''}
-        <span class="service-pill-label">${esc(label)}</span>
+      <button type="button" class="date-pill ${isActive ? 'is-active' : ''}"
+        data-action="switch-service" data-service-id="${escAttr(s.id)}">
+        <span class="pill-dot ${dotClass(s)}"></span>${esc(pillLabel(s))}
       </button>
     `;
   }).join('');
   el.innerHTML = html + `
-    <button type="button" class="service-pill is-new" data-action="new-service">+ New service</button>
+    <button type="button" class="date-pill new" data-action="new-service">＋ New service</button>
   `;
 }
 
 function updateAdminTitle() {
-  // H2 is now static ("Service builder"); the date being edited is shown
-  // by the active service-picker pill instead, so this is a no-op now.
-  // Kept as a callsite stub in case we want a date breadcrumb later.
+  // The H1 is the static "Plan" title. The service-header card and the
+  // active pill in the date switcher carry the per-service date.
+  updateServiceHeader();
+}
+
+function updateServiceHeader() {
+  const monthEl = document.getElementById('sh-month');
+  const dayEl = document.getElementById('sh-day');
+  const labelEl = document.getElementById('sh-label');
+  const valueEl = document.getElementById('sh-value');
+  if (!monthEl || !dayEl || !labelEl || !valueEl) return;
+
+  const m = (draft.date || '').match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (m) {
+    const date = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+    monthEl.textContent = date.toLocaleDateString(undefined, { month: 'short' });
+    dayEl.textContent = String(Number(m[3]));
+    const weekday = date.toLocaleDateString(undefined, { weekday: 'long' });
+    labelEl.textContent = `Service · ${weekday}`;
+  } else {
+    monthEl.textContent = '—';
+    dayEl.textContent = '—';
+    labelEl.textContent = 'Service';
+  }
+  const account = getAccount();
+  const sub = (draft.subtitle || '').trim();
+  valueEl.textContent = sub ? `${account.church || ''} · ${sub}` : (account.church || '');
 }
 
 function updateDatePreview() {
@@ -1079,48 +1120,98 @@ function ensureDraftIds() {
   });
 }
 
+const GRIP_SVG = `<svg viewBox="0 0 10 18" fill="currentColor" aria-hidden="true">
+  <circle cx="2" cy="3" r="1.2"/><circle cx="8" cy="3" r="1.2"/>
+  <circle cx="2" cy="9" r="1.2"/><circle cx="8" cy="9" r="1.2"/>
+  <circle cx="2" cy="15" r="1.2"/><circle cx="8" cy="15" r="1.2"/>
+</svg>`;
+const CHEVRON_SVG = `<svg viewBox="0 0 12 8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M2 2l4 4 4-4"/></svg>`;
+const DUPLICATE_SVG = `<svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="1.5"/><path d="M5.5 3V1.5h7v7H11"/></svg>`;
+const TRASH_SVG = `<svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M3 4h8M5.5 4V2.5h3V4M4 4l.6 8h4.8L10 4"/></svg>`;
+
+function itemSummaryMeta(item) {
+  // A short trailing meta string for the collapsed item title row.
+  if (item.kind === 'song') {
+    const stanzas = (item.body || '').split(/\n\s*\n/).filter((s) => s.trim());
+    const hasChorus = stanzas.some((s) => /^\s*\[chorus\]/i.test(s));
+    const verses = stanzas.filter((s) => !/^\s*\[chorus\]/i.test(s)).length;
+    const parts = [];
+    if (verses) parts.push(`${verses} verse${verses === 1 ? '' : 's'}`);
+    if (hasChorus) parts.push('refrain');
+    return parts.join(', ');
+  }
+  if (item.kind === 'scripture') {
+    return (item.meta || '').trim();
+  }
+  if (item.kind === 'note') {
+    const paras = (item.body || '').split(/\n\s*\n/).filter((p) => p.trim()).length;
+    return paras ? `${paras} prompt${paras === 1 ? '' : 's'}` : '';
+  }
+  return '';
+}
+
 function paintEditor() {
   ensureDraftIds();
   editorEl().innerHTML = draft.blocks.map((item, i) => {
     const cfg = ITEM_TYPES[item.kind] || ITEM_TYPES.note;
-    const collapsed = collapsedIds.has(item._id);
+    const isOpen = !collapsedIds.has(item._id);
     const summary = (item.title || '').trim() || `Untitled ${cfg.label.toLowerCase()}`;
+    const meta = itemSummaryMeta(item);
     return `
-      <div class="item-card ${collapsed ? 'is-collapsed' : ''}" data-index="${i}" data-block-id="${escAttr(item._id)}">
-        <div class="item-card-head">
-          <span class="drag-handle" aria-label="Drag to reorder" title="Drag to reorder">⋮⋮</span>
-          <span class="item-card-num">${esc(cfg.label)}</span>
-          <span class="item-card-summary">${esc(summary)}</span>
-          <div class="item-card-actions">
-            <button type="button" class="icon-btn collapse-btn" data-action="toggle-collapse" aria-label="${collapsed ? 'Expand' : 'Collapse'}">${collapsed ? '▸' : '▾'}</button>
-            <button type="button" class="remove-btn" data-action="remove" data-index="${i}">Remove</button>
-          </div>
+      <div class="item ${isOpen ? 'is-open' : ''}" data-index="${i}" data-block-id="${escAttr(item._id)}">
+        <div class="item-head" data-action="toggle-collapse">
+          <span class="grip" data-no-collapse="1" aria-hidden="true">${GRIP_SVG}</span>
+          <span class="type-badge ${item.kind}">${esc(cfg.label)}</span>
+          <span class="item-title">${esc(summary)}${meta ? ` <span class="meta">· ${esc(meta)}</span>` : ''}</span>
+          <span class="chevron">${CHEVRON_SVG}</span>
         </div>
 
-        <div class="item-card-body">
-          <label for="title-${i}">${item.kind === 'scripture' ? 'Reference' : 'Title'}</label>
-          ${item.kind === 'song' ? `
-            <div class="title-wrap">
-              <input type="text" id="title-${i}" data-field="title" data-index="${i}" data-song-title="1" value="${escAttr(item.title)}" placeholder="${escAttr(cfg.titlePlaceholder)}" autocomplete="off">
-              <div class="song-suggest" data-suggest-for="${i}" hidden></div>
-            </div>
-          ` : `
-            <input type="text" id="title-${i}" data-field="title" data-index="${i}" value="${escAttr(item.title)}" placeholder="${escAttr(cfg.titlePlaceholder)}">
-          `}
+        <div class="item-body">
+          <div class="field">
+            <span class="field-label">${item.kind === 'scripture' ? 'Reference' : 'Title'}</span>
+            ${item.kind === 'song' ? `
+              <div class="title-wrap">
+                <input class="input" type="text" id="title-${i}" data-field="title" data-index="${i}" data-song-title="1" value="${escAttr(item.title)}" placeholder="${escAttr(cfg.titlePlaceholder)}" autocomplete="off">
+                <div class="song-suggest" data-suggest-for="${i}" hidden></div>
+              </div>
+            ` : `
+              <input class="input" type="text" id="title-${i}" data-field="title" data-index="${i}" value="${escAttr(item.title)}" placeholder="${escAttr(cfg.titlePlaceholder)}">
+            `}
+          </div>
 
           ${cfg.metaLabel ? `
-            <label for="meta-${i}">${esc(cfg.metaLabel)}</label>
-            <input type="text" id="meta-${i}" data-field="meta" data-index="${i}" value="${escAttr(item.meta)}" placeholder="${escAttr(cfg.metaPlaceholder)}">
+            <div class="field">
+              <span class="field-label">${esc(cfg.metaLabel)}</span>
+              <input class="input" type="text" id="meta-${i}" data-field="meta" data-index="${i}" value="${escAttr(item.meta)}" placeholder="${escAttr(cfg.metaPlaceholder)}">
+            </div>
           ` : ''}
 
-          <label for="body-${i}">${esc(cfg.bodyLabel)}</label>
-          <textarea id="body-${i}" data-field="body" data-index="${i}" placeholder="${escAttr(cfg.bodyPlaceholder)}">${esc(item.body)}</textarea>
-          <div class="field-hint">${esc(cfg.bodyHint)}</div>
+          <div class="field">
+            <span class="field-label">${esc(cfg.bodyLabel)}</span>
+            <textarea class="lyrics-area" id="body-${i}" data-field="body" data-index="${i}" placeholder="${escAttr(cfg.bodyPlaceholder)}">${esc(item.body)}</textarea>
+            <div class="helper">${esc(cfg.bodyHint)}</div>
+          </div>
+
+          <div class="item-toolbar">
+            <div class="toolbar-left">
+              <button type="button" class="icon-action" data-action="duplicate" data-index="${i}" aria-label="Duplicate" title="Duplicate">${DUPLICATE_SVG}</button>
+              <button type="button" class="icon-action danger" data-action="remove" data-index="${i}" aria-label="Remove" title="Remove">${TRASH_SVG}</button>
+            </div>
+            <button type="button" class="done-btn" data-action="toggle-collapse">Done</button>
+          </div>
         </div>
       </div>
     `;
   }).join('');
+  updateSectionCount();
   initSortable();
+}
+
+function updateSectionCount() {
+  const el = document.getElementById('section-head-label');
+  if (!el) return;
+  const n = draft.blocks.length;
+  el.textContent = `Service order · ${n} item${n === 1 ? '' : 's'}`;
 }
 
 function initSortable() {
@@ -1130,7 +1221,7 @@ function initSortable() {
     try { editor.__sortable.destroy(); } catch (_) {}
   }
   editor.__sortable = Sortable.create(editor, {
-    handle: '.drag-handle',
+    handle: '.grip',
     animation: 160,
     ghostClass: 'item-card-ghost',
     chosenClass: 'item-card-chosen',
@@ -1256,14 +1347,21 @@ document.addEventListener('click', (e) => {
     const last = editorEl().querySelector('.item-card:last-child input');
     if (last) last.focus();
   } else if (action === 'toggle-collapse') {
-    const card = t.closest('.item-card');
+    // Don't toggle when the grip is the actual click target (drag handle).
+    if (e.target.closest('[data-no-collapse]')) return;
+    const card = t.closest('.item');
     if (!card) return;
     const id = card.dataset.blockId;
-    if (collapsedIds.has(id)) collapsedIds.delete(id);
-    else collapsedIds.add(id);
-    card.classList.toggle('is-collapsed');
-    t.textContent = card.classList.contains('is-collapsed') ? '▸' : '▾';
-    t.setAttribute('aria-label', card.classList.contains('is-collapsed') ? 'Expand' : 'Collapse');
+    // .item.is-open === expanded; collapsedIds tracks ids currently collapsed.
+    if (collapsedIds.has(id)) {
+      collapsedIds.delete(id);
+      card.classList.add('is-open');
+    } else {
+      collapsedIds.add(id);
+      card.classList.remove('is-open');
+    }
+  } else if (action === 'duplicate' && i !== null) {
+    duplicateBlock(i);
   } else if (action === 'collapse-all') {
     draft.blocks.forEach((b) => collapsedIds.add(b._id));
     paintEditor();
@@ -1507,6 +1605,16 @@ function newService() {
   saveServices(services);
   setEditingId(fresh.id);
   renderAdmin();
+}
+
+function duplicateBlock(i) {
+  const original = draft.blocks[i];
+  if (!original) return;
+  const copy = JSON.parse(JSON.stringify(original));
+  copy._id = '_' + Math.random().toString(36).slice(2, 10);
+  draft.blocks.splice(i + 1, 0, copy);
+  paintEditor();
+  scheduleAutoSave();
 }
 
 function deleteCurrentService() {
