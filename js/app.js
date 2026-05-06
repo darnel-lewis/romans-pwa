@@ -1668,6 +1668,9 @@ function newService() {
   saveServices(services);
   setEditingId(fresh.id);
   renderAdmin();
+  // Brand-new service — expand the header so the user can pick a date.
+  const sh = document.getElementById('service-header');
+  if (sh) sh.open = true;
 }
 
 function duplicateBlock(i) {

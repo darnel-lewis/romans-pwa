@@ -2315,16 +2315,14 @@ body.modal-open { overflow: hidden; }
   margin-top: 6px;
   line-height: 1.4;
 }
-.sh-delete {
+.sh-footer {
   margin-top: 18px;
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #E9C7C7;
-  background: transparent;
-  color: var(--plan-danger);
-  border-radius: 10px;
-  font-size: 14px;
-  font-weight: 600;
+  display: flex;
+  justify-content: flex-end;
+}
+.sh-trash {
+  width: 32px;
+  height: 32px;
 }
 
 /* --- Section head --- */
