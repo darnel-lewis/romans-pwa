@@ -2621,9 +2621,12 @@ body.modal-open { overflow: hidden; }
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: var(--plan-live);
+  background: var(--plan-ink-35);
   flex-shrink: 0;
 }
+.status-line .status-dot[data-state="live"]      { background: var(--plan-live); }
+.status-line .status-dot[data-state="scheduled"] { background: var(--plan-accent); }
+.status-line .status-dot[data-state="past"]      { background: var(--plan-ink-35); }
 .status-line .save-status[data-state="saving"] { color: var(--plan-draft); }
 .status-line .save-status[data-state="dirty"] { color: var(--plan-ink-55); }
 .status-line .save-status[data-state="saved"] { color: var(--plan-ink-70); }
