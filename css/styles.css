@@ -799,29 +799,62 @@ textarea { resize: vertical; min-height: 180px; line-height: 1.6; font-family: u
   background: #fff;
   border: 1px solid #e8e2d6;
   border-radius: 10px;
-  padding: .65rem .75rem;
+  padding: .85rem .95rem;
   cursor: pointer;
   text-align: left;
   display: flex;
   flex-direction: column;
-  gap: .15rem;
+  gap: .25rem;
   font-family: inherit;
   transition: border-color .15s, background .15s;
 }
 .style-option:hover { border-color: #c9b894; }
 .style-option.selected {
   border-color: #6b4f2a;
-  background: #f1ead9;
+  box-shadow: 0 0 0 2px #f1ead9;
 }
-.style-option-label {
-  font-family: 'Cormorant Garamond', Georgia, serif;
-  font-size: 1rem;
+
+/* Style A preview: paper bg, Inter, modern accent */
+.style-option[data-style="a"] {
+  background: #F7F6F3;
+}
+.style-option[data-style="a"] .style-option-label {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-weight: 700;
+  font-size: 1.6rem;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: #101113;
+}
+.style-option[data-style="a"] .style-option-name {
+  font-family: 'Inter', system-ui, sans-serif;
   font-weight: 600;
-  color: #6b4f2a;
+  font-size: .68rem;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: #1F4D4A;
 }
-.style-option-name {
-  font-size: .82rem;
+
+/* Style B preview: cream bg, Newsreader italic, warm gold accent */
+.style-option[data-style="b"] {
+  background: #fbf7ed;
+}
+.style-option[data-style="b"] .style-option-label {
+  font-family: 'Newsreader', 'Cormorant Garamond', Georgia, serif;
+  font-style: italic;
+  font-weight: 500;
+  font-size: 1.6rem;
+  letter-spacing: -0.005em;
+  line-height: 1;
+  color: #8a6a3a;
+}
+.style-option[data-style="b"] .style-option-name {
+  font-family: 'Newsreader', 'Cormorant Garamond', Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: .95rem;
   color: #4a4a4a;
+  letter-spacing: .005em;
 }
 
 .add-row {
