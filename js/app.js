@@ -255,27 +255,46 @@ function setEditingId(id) {
   else localStorage.removeItem(STORAGE_KEYS.editingId);
 }
 
-/* "Live" service: the one whose date is closest to today. Ties favor
- * future services so by midweek the page rolls forward to next Sunday. */
+/* "Live" service rule: prefer the next upcoming service (today counts as
+ * upcoming). If nothing is scheduled ahead, fall back to the most recent
+ * past service. Worship admins get a "preview the next service" experience
+ * — as soon as next Sunday's service is created, the public page rolls
+ * forward to it. */
 function getLiveService(services) {
   const list = services || getServices();
   if (!list.length) return null;
   const today = todayISO();
-  let best = list[0];
-  let bestDiff = Math.abs(daysBetween(best.date, today));
-  let bestFuture = daysBetween(best.date, today) >= 0;
-  for (let i = 1; i < list.length; i++) {
-    const s = list[i];
-    const d = daysBetween(s.date, today);
-    const abs = Math.abs(d);
-    const future = d >= 0;
-    if (abs < bestDiff || (abs === bestDiff && future && !bestFuture)) {
-      best = s;
-      bestDiff = abs;
-      bestFuture = future;
-    }
+
+  // Today's service wins outright if it exists.
+  const exact = list.find((s) => s.date === today);
+  if (exact) return exact;
+
+  // Otherwise the soonest upcoming service.
+  const upcoming = list
+    .filter((s) => s.date && s.date > today)
+    .sort((a, b) => a.date.localeCompare(b.date));
+  if (upcoming.length) return upcoming[0];
+
+  // No upcoming → most recent past service.
+  const past = list
+    .filter((s) => s.date && s.date <= today)
+    .sort((a, b) => b.date.localeCompare(a.date));
+  if (past.length) return past[0];
+
+  return list[0];
+}
+
+/* The status text that pairs with auto-save. Tells the admin whether the
+ * service they're editing is the one rendering publicly. */
+function draftLiveStatus() {
+  const live = getLiveService();
+  const isLive = live && live.id === draft.id;
+  if (isLive) return { state: 'live', text: 'Live for the congregation' };
+  const today = todayISO();
+  if (draft.date && draft.date > today) {
+    return { state: 'scheduled', text: 'Scheduled' };
   }
-  return best;
+  return { state: 'past', text: 'Past service' };
 }
 
 /* For public-page consumers: returns a single object with account
@@ -944,7 +963,8 @@ function renderAdmin() {
   paintServicePicker();
   updateAdminTitle();
   updateDatePreview();
-  setSaveStatus('saved', 'Saved · live for the congregation');
+  const status = draftLiveStatus();
+  setSaveStatus('saved', `Saved · ${status.text}`);
 }
 
 /* Renders the horizontal service-picker bar. One pill per saved service
@@ -1710,7 +1730,8 @@ function performSave({ silent = false } = {}) {
   libraryUpsert(blocks.filter((b) => b.kind === 'song'));
   paintServicePicker();
   const t = new Date().toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
-  setSaveStatus('saved', `Saved at ${t}`);
+  const status = draftLiveStatus();
+  setSaveStatus('saved', `Saved ${t} · ${status.text}`);
   if (!silent) {
     const msg = document.getElementById('save-message');
     if (msg) {
@@ -1728,9 +1749,17 @@ function scheduleAutoSave() {
 
 function setSaveStatus(state, text) {
   const el = document.getElementById('save-status');
-  if (!el) return;
-  el.dataset.state = state;
-  el.textContent = text;
+  if (el) {
+    el.dataset.state = state;
+    el.textContent = text;
+  }
+  // Color the status-line dot by the draft's live status, not by the
+  // save state (which is transient). Stays in sync with the message text.
+  const dot = document.getElementById('status-line-dot');
+  if (dot && typeof draft === 'object' && draft) {
+    const ls = draftLiveStatus();
+    dot.dataset.state = ls.state;
+  }
 }
 
 const saveBtn = document.getElementById('save-btn');
