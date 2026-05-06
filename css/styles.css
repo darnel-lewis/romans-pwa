@@ -2095,7 +2095,7 @@ body.modal-open { overflow: hidden; }
   color: var(--plan-ink);
   max-width: 480px;
   margin: 0 auto;
-  padding: 0 0 110px;
+  padding: 0 0 32px;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 

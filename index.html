@@ -184,6 +184,7 @@
         <div class="admin-menu" id="admin-menu" hidden>
           <div class="admin-menu-email" id="signed-in-as"></div>
           <button type="button" class="admin-menu-item" data-action="toggle-panel" data-panel="settings">Settings</button>
+          <button type="button" class="admin-menu-item" data-action="toggle-panel" data-panel="share">Share link</button>
           <button type="button" class="admin-menu-item" data-action="toggle-panel" data-panel="library">Song library</button>
           <button type="button" class="admin-menu-item" data-action="toggle-panel" data-panel="members">Members</button>
           <button type="button" class="admin-menu-item" data-action="toggle-panel" data-panel="past-services">Past services</button>
@@ -235,6 +236,7 @@
     <div class="section-head">
       <h2 id="section-head-label">Service order · 0 items</h2>
       <div class="actions">
+        <a href="#" class="ghost-btn" data-action="open-preview">Preview</a>
         <button type="button" class="ghost-btn" data-action="open-bulk-paste">Bulk paste</button>
         <button type="button" class="ghost-btn" data-action="collapse-all">Collapse all</button>
         <button type="button" class="ghost-btn" data-action="expand-all">Expand all</button>
@@ -256,16 +258,6 @@
       <span class="status-dot" id="status-line-dot"></span>
       <span class="save-status" id="save-status" data-state="idle"></span>
       <span id="save-message" class="save-message"></span>
-    </div>
-
-    <!-- Bottom action bar -->
-    <div class="bottom-bar">
-      <div class="bottom-bar-inner">
-        <a href="#" class="secondary-btn" data-action="open-preview">Preview</a>
-        <button type="button" class="primary-btn" data-action="toggle-panel" data-panel="share">
-          <span class="primary-dot"></span> Share with congregation
-        </button>
-      </div>
     </div>
 
     <!-- Modals (Settings / Library / Share) -->
