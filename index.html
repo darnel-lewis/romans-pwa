@@ -206,7 +206,7 @@
     </div>
 
     <!-- Service header card (collapsible date / details) -->
-    <details class="service-header" id="service-header" open>
+    <details class="service-header" id="service-header">
       <summary>
         <div class="sh-icon">
           <span class="mo" id="sh-month"></span>
@@ -228,7 +228,13 @@
           <input class="sh-input" type="text" id="subtitle-text" placeholder="e.g. Easter Sunday · April 5">
           <div class="sh-helper">Overrides the auto-formatted date on the public page.</div>
         </div>
-        <button type="button" class="sh-delete" data-action="delete-service">Delete this service</button>
+        <div class="sh-footer">
+          <button type="button" class="icon-action danger sh-trash" data-action="delete-service" aria-label="Delete this service" title="Delete this service">
+            <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true">
+              <path d="M3 4h8M5.5 4V2.5h3V4M4 4l.6 8h4.8L10 4"/>
+            </svg>
+          </button>
+        </div>
       </div>
     </details>
 
