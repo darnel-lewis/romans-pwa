@@ -952,6 +952,12 @@ function renderAdmin() {
   if (!draft.blocks.length) draft.blocks.push(emptyDraftItem('song'));
   if (!draft.date) draft.date = nextSundayISO();
   if (!draft.id) draft.id = makeId();
+  ensureDraftIds();
+  // Collapse all existing items on load — admin can scan dates fast,
+  // tap one to expand. New items added via +Song/etc. start expanded
+  // (their fresh _id isn't in collapsedIds).
+  collapsedIds.clear();
+  draft.blocks.forEach((b) => collapsedIds.add(b._id));
   document.getElementById('church-name').value = draft.church || '';
   document.getElementById('service-date-input').value = draft.date || '';
   document.getElementById('subtitle-text').value = draft.subtitle || '';
@@ -965,6 +971,14 @@ function renderAdmin() {
   updateDatePreview();
   const status = draftLiveStatus();
   setSaveStatus('saved', `Saved · ${status.text}`);
+}
+
+function updateToggleAllBtn() {
+  const btn = document.getElementById('toggle-all-btn');
+  if (!btn) return;
+  const allCollapsed = draft.blocks.length > 0 &&
+    draft.blocks.every((b) => collapsedIds.has(b._id));
+  btn.textContent = allCollapsed ? 'Expand all' : 'Collapse all';
 }
 
 /* Renders the horizontal service-picker bar. One pill per saved service
@@ -1251,6 +1265,7 @@ function updateSectionCount() {
     el.textContent = `Service order · ${n} item${n === 1 ? '' : 's'}`;
   }
   updateServiceHeader();
+  updateToggleAllBtn();
 }
 
 function initSortable() {
@@ -1404,13 +1419,17 @@ document.addEventListener('click', (e) => {
       collapsedIds.add(id);
       card.classList.remove('is-open');
     }
+    updateToggleAllBtn();
   } else if (action === 'duplicate' && i !== null) {
     duplicateBlock(i);
-  } else if (action === 'collapse-all') {
-    draft.blocks.forEach((b) => collapsedIds.add(b._id));
-    paintEditor();
-  } else if (action === 'expand-all') {
-    collapsedIds.clear();
+  } else if (action === 'toggle-all') {
+    const allCollapsed = draft.blocks.length > 0 &&
+      draft.blocks.every((b) => collapsedIds.has(b._id));
+    if (allCollapsed) {
+      collapsedIds.clear();
+    } else {
+      draft.blocks.forEach((b) => collapsedIds.add(b._id));
+    }
     paintEditor();
   } else if (action === 'switch-service') {
     switchService(t.dataset.serviceId);
