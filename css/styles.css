@@ -2095,7 +2095,7 @@ body.modal-open { overflow: hidden; }
   color: var(--plan-ink);
   max-width: 480px;
   margin: 0 auto;
-  padding: 0 0 32px;
+  padding: 0 0 100px;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
@@ -2556,26 +2556,36 @@ body.modal-open { overflow: hidden; }
   letter-spacing: -0.05px;
 }
 
-/* --- Add item row --- */
+/* --- Add item row (sticky bottom dock) --- */
 .add-item {
-  margin: 14px 22px 0;
-  border: 1px dashed var(--plan-rule);
-  border-radius: 14px;
-  padding: 14px;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(247,246,243,0.94);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid var(--plan-rule);
+  padding: 12px 22px calc(12px + env(safe-area-inset-bottom));
+  margin: 0;
+  z-index: 20;
+}
+.add-item-inner {
+  max-width: 480px;
+  margin: 0 auto;
   display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  background: transparent;
+  gap: 10px;
+  width: 100%;
 }
 .add-chip {
-  flex: 1;
-  min-width: 90px;
-  padding: 10px 12px;
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 14px 12px;
   background: var(--paper-alt);
-  border: 1px solid var(--plan-rule-soft);
+  border: 1px solid var(--plan-rule);
   border-radius: 10px;
-  color: var(--plan-ink-70);
-  font-size: 13px;
+  color: var(--plan-ink);
+  font-size: 14.5px;
   font-weight: 600;
   display: flex;
   align-items: center;
@@ -2584,12 +2594,16 @@ body.modal-open { overflow: hidden; }
   letter-spacing: -0.05px;
 }
 .add-chip:hover {
-  background: var(--paper);
-  border-color: var(--plan-rule);
+  background: #fff;
+  border-color: var(--plan-ink-35);
+}
+.add-chip:active {
+  transform: translateY(1px);
 }
 .add-chip .plus {
   color: var(--plan-accent);
   font-weight: 800;
+  font-size: 16px;
 }
 
 /* --- Status line --- */
